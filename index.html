@@ -342,6 +342,19 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
       font-size: 13px;
       color: var(--text-muted);
     }
+    .guide-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--blue-500);
+      border-bottom: 1px solid transparent;
+      transition: border-color .15s ease;
+    }
+    .guide-link:hover { border-bottom-color: var(--blue-500); }
+    .guide-link svg { width: 16px; height: 16px; }
 
     @media (max-width: 720px) {
       .acct-chip { display: none; }
@@ -427,6 +440,10 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
         </button>
       </div>
       <div class="hero-hint">Both open Pay on the dev environment. Fresh accounts start at KYC onboarding. Broker, Shareholder, Dashboard and Customer are placeholders.</div>
+      <a class="guide-link" href="guide.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Read the testing guide — features &amp; sample data
+      </a>
     </div>
   </main>
 
