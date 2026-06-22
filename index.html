@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WLTH Pay — Demo</title>
+  <meta name="description" content="Demo of the WealthPay platform shell. Choosing 'Pay' hands off to the Pay service frontend." />
+  <link rel="icon" href="data:," />
+
+  <!-- ============================================================
+       DEMO CONFIG  (dev env only)
+       The shell mints a WLTH SSO token and hands off to the dev BFF,
+       which verifies it, find-or-creates the user, sets the session
+       cookie, and redirects into the Pay web UI.
+         - "demo account"  => fixed wlthId (same seeded user every time)
+         - "fresh account" => unique wlthId (triggers KYC onboarding)
+       ssoUrl is the dev BFF SSO endpoint (BFF is served at /api/*).
+       privateKeyPkcs8Pem is the RS256 key whose public half is the
+       dev BFF's WLTH_SSO_PUBLIC_KEY. DEV ONLY — it is visible in page
+       source, so this must never point at a real/prod key.
+       ============================================================ -->
+  <script>
+    window.WLTH_SSO = {
+      ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth",
+      demoAccount: { wlthId: "new-user-1", email: "new-user-1@wlth.test", name: "Demo User" },
+      // Dev RS256 private key (PKCS#8 PEM); public half is the dev BFF's
+      // WLTH_SSO_PUBLIC_KEY. ponytail: dev-only, key intentionally inline.
+      privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmk8wXUHhNCTCt
+agVkHcrVoe8wn3YmzY4zV35XGAls8fGSVz/kiBa+SRlEjnnWqGOFP2IxA5ZgSaH0
+CfYDnYn8t8pLmR4b6KcnvXEFnAYiyZYx/Aj/6y/ys/223tsU6Pr6Ux+0NE2NnPZo
+ZVnL+47V5jJIoZHX3Oolh16lZWWR71IzyVbOituoCsKKKTLmmdO4gYSm8dNnW3uf
+Zux6uRxDNl/RumPF61ROwFoHddQbicpCHboG0GYTQ6noUypUqU6QQELSIHHj4ENt
+Z/Z1h+1jvB3zKarSTt/naCKohBNYE0V9wjEFtorjcQa52nBeJInLYP2cjKtJQ3NO
+Vy5wXYcrAgMBAAECggEAJal99/l8MaK1zEePz3qC7TlPLLWpD43jLE2IZaWsH+M2
+BKnQatmwFrbNTThPaM6qrapOh5lxivSq9tO3uUqJs8dUKDKG4bWA8ZW985A6vOvK
+FyQOXtpsfVnfr9SEQR6J/EYGAYbfz/hgp+reWiXWvhrtXImXQXCTygdoyUl7JPrT
+DkLG9a2Fzfabp5K4B3n1seSQXTuUGdMDJICjb+ndtfYJljGTEjSWF0oTy0ZBOfBq
+gWiZIID7DLTWkFObWxDELQE8PdvHEOkzvJ6mwxGK0wTw81RXsc159UTAgH6f6Sa9
+XG46gYsUmB1N49MvgEEx6xjOor6xGAXv04kQUQGIlQKBgQDBjo35bHzR0rqYFszL
+IpX8SCc4R/zwYp2R/zlYpnoe9wTQT6fKBf76FgQHcIPZYwEUmdH9zn21MauBsI4n
+ZNfm6aDgIMAAqEo1A3VFW39/g+gyfFxvgVo6W+S/ofaYLEec4/eB4MZPc6dMXlq5
+Ie9hax9cMa+AtG9uJHXjgQ9qbwKBgQDcUQ/XLVW0AroWmKwrvhJrly/IvfIgGAv6
+jFJyhLTtht7E3Rw+wZis6S5vVQ8d5t49XJHNC8FmcwHPIq4iPU+vnOxVGl4wYXp0
+NlXWT/Cs5AEVAGpfgAg775X7DsqiXhX9+udJf/FchvMLpsgTBQNn7rwcYnhpEW2u
+6Mhflow9BQKBgCbzzmSkzZXYZ87Vv88dnbuQtbvg2OlznyxThbHuhuMWaTSW4ziH
+7mFb7uGkZhRolT4VGqqOVMQTQ+Wsp18ML1r8J3EThjBbrdtvX7leiZEa9a67Ukrq
+aEMYXTenm53SQ3MyeYv8tUwmBUQcNPvO9YLQcRY3tY8cQNSUp9jqDzUnAoGAYnph
+aD89Zb8qSttnag4F0c28cDBnP+0/vXhnigTDksCMZtamv25tvixksyMEJMuDX043
+Zb3xbsfNcTcBOxDIw6iTAt9MZrfLspJu/+Kvo7guu6J56cIi7BeFpLjR3o3LqsEy
+DOqBimhPz093cvj0sspFjzJ8vAosStiGaCO0/7kCgYAhrMt9mtBtN41uzIfKurXc
+s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
+09wLeKpYuKWu/3ZFuun9rHBsAc/I/1LNOOuJbKBoZLHuT3r10fVaBtMK48QH2hPJ
+2e/0+cUsYKHePVZg7fsOKQ==
+-----END PRIVATE KEY-----`,
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --surface: #ffffff;
+      --text: #292e3a;
+      --text-dimmed: #6f7682;
+      --text-muted: #8a909c;
+      --blue-500: #1445c7;
+      --blue-400: #3d6ae0;
+      --blue-600: #1039a8;
+      --blue-soft: #eef1ff;
+      --border: #eceff0;
+      --pill-border: #b8c5ca;
+      --chip-border: #b8c5ca;
+      --chip-hover: #ececec;
+      --slate: #4c5a68;
+      --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
+      --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ---------------- Demo notice ---------------- */
+    .demo-bar {
+      background: var(--blue-soft);
+      color: var(--blue-500);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-bar b { font-weight: 600; }
+
+    /* ---------------- Header ---------------- */
+    header {
+      height: 100px;
+      display: flex;
+      align-items: center;
+    }
+    .header-inner {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; margin-right: 6px; }
+    .logo { height: 20px; width: auto; color: var(--text); user-select: none; }
+    .demo-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--blue-500);
+      background: var(--blue-soft);
+      border: 1px solid #dbe2fb;
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+
+    /* Service dropdown trigger */
+    .pay-dropdown { position: relative; }
+    .pay-trigger {
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border-radius: 9999px;
+      padding: 8px 12px;
+      transition: background .15s ease;
+    }
+    .pay-trigger:hover { background: #fafafa; }
+    .pay-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--pill-border);
+      border-radius: 24px;
+      background: transparent;
+      color: var(--text);
+      padding: 8px 14px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .pay-trigger:hover .pay-pill { border-color: #a9afb9; }
+    /* Highlight the trigger while the menu is open */
+    .pay-dropdown.open .pay-pill { border-color: var(--blue-500); }
+
+    .pay-pill .pill-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--text-dimmed); }
+    .pay-pill .pill-label { white-space: nowrap; }
+    .pay-pill .chevron {
+      width: 18px; height: 18px;
+      flex-shrink: 0;
+      color: var(--text-dimmed);
+      transition: transform .2s ease;
+    }
+    .pay-dropdown.open .pay-pill .chevron { transform: rotate(180deg); color: var(--blue-500); }
+
+    /* Dropdown menu */
+    .pay-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 8px;
+      min-width: 224px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow-menu);
+      padding: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      z-index: 50;
+    }
+    .pay-dropdown.open .pay-menu { display: flex; animation: pop .14s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      transition: background .12s ease;
+    }
+    .menu-item:hover { background: #f5f6f7; }
+    .menu-item svg { width: 20px; height: 20px; color: var(--text-dimmed); flex-shrink: 0; }
+    .menu-item.current { background: var(--blue-soft); color: var(--blue-500); }
+    .menu-item.current svg { color: var(--blue-400); }
+    .menu-item.current:hover { background: #e6ebff; }
+
+    .spacer { flex: 1; }
+
+    /* Right cluster */
+    .right-cluster { display: flex; align-items: center; gap: 12px; }
+    .acct-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--chip-border);
+      border-radius: 24px;
+      padding: 7px 12px 7px 8px;
+      font-size: 14px;
+      font-weight: 500;
+      background: transparent;
+      transition: background .12s ease;
+    }
+    .acct-chip:hover { background: var(--chip-hover); }
+    .acct-badge {
+      width: 26px; height: 26px;
+      border-radius: 9999px;
+      background: #e9eaec;
+      color: var(--text-dimmed);
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .acct-chip .chev { color: var(--text-dimmed); width: 16px; height: 16px; }
+    .avatar {
+      width: 36px; height: 36px;
+      border-radius: 9999px;
+      background: var(--text);
+      color: #fff;
+      font-size: 12px; font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bell {
+      position: relative;
+      width: 36px; height: 36px;
+      border-radius: 9999px;
+      background: var(--slate);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .bell svg { width: 18px; height: 18px; }
+    .bell::after {
+      content: "";
+      position: absolute;
+      top: 7px; right: 8px;
+      width: 8px; height: 8px;
+      border-radius: 9999px;
+      background: #22c55e;
+      border: 2px solid var(--slate);
+    }
+
+    /* ---------------- Hero ---------------- */
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 80px 24px 96px;
+    }
+    .hero-eyebrow {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--blue-500);
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+    .hero p {
+      max-width: 540px;
+      margin: 16px auto 0;
+      color: var(--text-dimmed);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-500);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+      padding: 14px 24px;
+      border-radius: 12px;
+      margin-top: 32px;
+      transition: background .15s ease, transform .1s ease;
+    }
+    .btn-primary:hover { background: var(--blue-600); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary svg { width: 18px; height: 18px; }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 500;
+      padding: 14px 24px;
+      border: 1px solid var(--pill-border);
+      border-radius: 12px;
+      transition: background .15s ease, border-color .15s ease, transform .1s ease;
+    }
+    .btn-secondary:hover { background: #fafafa; border-color: #a9afb9; }
+    .btn-secondary:active { transform: translateY(1px); }
+    .btn-secondary svg { width: 18px; height: 18px; color: var(--text-dimmed); }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+    .hero-actions .btn-primary { margin-top: 0; }
+    .hero-hint {
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 720px) {
+      .acct-chip { display: none; }
+      .hero h1 { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-bar">
+    <b>WLTH Pay — Demo shell.</b> Open the services menu and choose <b>Pay</b> (or use the button below) to hand off to the Pay frontend.
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
+        <span class="demo-tag">Demo</span>
+      </div>
+
+      <!-- Service switcher (defaults to Broker; choosing Pay redirects) -->
+      <div class="pay-dropdown" id="payDropdown">
+        <button class="pay-trigger" id="payTrigger" aria-haspopup="menu" aria-expanded="false">
+          <span class="pay-pill">
+            <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+            <span class="pill-label">Broker</span>
+            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </button>
+
+        <div class="pay-menu" role="menu" aria-label="Services">
+          <button class="menu-item current" role="menuitem" data-service="broker">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+            Broker
+          </button>
+          <button class="menu-item" role="menuitem" data-service="pay">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            Pay
+          </button>
+          <button class="menu-item" role="menuitem" data-service="shareholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            Shareholder
+          </button>
+          <button class="menu-item" role="menuitem" data-service="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Dashboard
+          </button>
+          <button class="menu-item" role="menuitem" data-service="customer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Customer
+          </button>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="right-cluster">
+        <button class="acct-chip">
+          <span class="acct-badge">AC</span>
+          Acme Corp
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <button class="bell" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+        </button>
+        <div class="avatar">AJ</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="hero-eyebrow">WealthPay Platform</div>
+      <h1>Welcome to WealthPay</h1>
+      <p>This is a demo of the WealthPay platform shell. The Pay service is handled by our team — jump into the demo account, or create a fresh one to walk through onboarding.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" id="launchDemo">
+          Use demo account
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+        <button class="btn-secondary" id="launchFresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          Create fresh account
+        </button>
+      </div>
+      <div class="hero-hint">Both open Pay on the dev environment. Fresh accounts start at KYC onboarding. Broker, Shareholder, Dashboard and Customer are placeholders.</div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var dropdown = document.getElementById("payDropdown");
+      var trigger = document.getElementById("payTrigger");
+      var launchDemo = document.getElementById("launchDemo");
+      var launchFresh = document.getElementById("launchFresh");
+      var items = document.querySelectorAll(".menu-item");
+      var pillIcon = document.querySelector(".pill-icon");
+      var pillLabel = document.querySelector(".pill-label");
+
+      // ---- WLTH SSO token minting (RS256, client-side via Web Crypto) ----
+      function b64url(bytes) {
+        var arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+        var bin = "";
+        for (var i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+        return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      }
+      function b64urlStr(str) { return b64url(new TextEncoder().encode(str)); }
+      function pemToPkcs8(pem) {
+        var body = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+        var raw = atob(body);
+        var buf = new Uint8Array(raw.length);
+        for (var i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
+        return buf.buffer;
+      }
+      async function mintToken(claims, pem) {
+        var key = await crypto.subtle.importKey(
+          "pkcs8", pemToPkcs8(pem),
+          { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]
+        );
+        var now = Math.floor(Date.now() / 1000);
+        var header = b64urlStr(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+        var payload = b64urlStr(JSON.stringify(Object.assign({ iat: now, exp: now + 300 }, claims)));
+        var data = header + "." + payload;
+        var sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(data));
+        return data + "." + b64url(sig);
+      }
+      async function handoff(mode) {
+        var cfg = window.WLTH_SSO || {};
+        if (!cfg.privateKeyPkcs8Pem) {
+          alert("Dev SSO key not configured: set window.WLTH_SSO.privateKeyPkcs8Pem in index.html.");
+          return;
+        }
+        var claims = mode === "demo"
+          ? cfg.demoAccount
+          : { wlthId: "wlth-" + crypto.randomUUID(), email: "fresh-" + Date.now() + "@wlth.test", name: "New User" };
+        try {
+          var token = await mintToken(claims, cfg.privateKeyPkcs8Pem);
+          window.open(cfg.ssoUrl + "?token=" + encodeURIComponent(token), "_blank", "noopener");
+        } catch (e) {
+          alert("Could not mint SSO token: " + e.message);
+        }
+      }
+
+      function open() {
+        dropdown.classList.add("open");
+        trigger.setAttribute("aria-expanded", "true");
+      }
+      function close() {
+        dropdown.classList.remove("open");
+        trigger.setAttribute("aria-expanded", "false");
+      }
+      function toggle() {
+        dropdown.classList.contains("open") ? close() : open();
+      }
+
+      // Switch the displayed service (placeholders only — Pay is handled separately)
+      function selectService(el) {
+        var icon = el.querySelector("svg");
+        if (icon) pillIcon.innerHTML = icon.innerHTML;
+        pillLabel.textContent = el.textContent.trim();
+        items.forEach(function (i) { i.classList.remove("current"); });
+        el.classList.add("current");
+      }
+
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggle();
+      });
+
+      // Close on outside click / Escape
+      document.addEventListener("click", function (e) {
+        if (!dropdown.contains(e.target)) close();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") close();
+      });
+
+      launchDemo.addEventListener("click", function () { handoff("demo"); });
+      launchFresh.addEventListener("click", function () { handoff("fresh"); });
+
+      items.forEach(function (el) {
+        el.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (el.getAttribute("data-service") === "pay") {
+            handoff("demo");      // Pay hands off to the dev Pay UI (demo account)
+            return;
+          }
+          selectService(el);      // other services just switch the shown value
+          close();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
