@@ -216,6 +216,21 @@
   .tc .brand { font-weight: 600; font-size: 14px; }
   .tc .pan { font-family: var(--mono); font-size: 14px; letter-spacing: 0.05em; color: var(--accent); }
 
+  /* ---- sample payees ---- */
+  .payees { margin-top: 30px; border-top: 1px solid var(--line); padding-top: 28px; }
+  .payee-list { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .payee-row {
+    display: grid; grid-template-columns: 132px 64px 1fr; gap: 16px; align-items: center;
+    padding: 14px 20px; border-top: 1px solid var(--line); background: var(--surface);
+  }
+  .payee-row:first-child { border-top: none; }
+  .ptype {
+    justify-self: start; font-size: 12px; font-weight: 600; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 12px; border-radius: 999px;
+  }
+  .payee-row .method { font-family: var(--mono); font-size: 12px; color: var(--text-soft); }
+  .payee-row .acct { font-family: var(--mono); font-size: 14px; letter-spacing: 0.03em; color: var(--accent); }
+
   /* ---- footer ---- */
   footer { padding: 40px 0 64px; color: var(--text-faint); font-family: var(--mono); font-size: 12px; }
   footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line); padding-top: 22px; }
@@ -490,6 +505,17 @@
           <div class="row"><span class="k">Monthly volume</span><span class="v">1000–10000 <small>or whatever the dropdown offers</small></span></div>
         </div>
       </div>
+    </div>
+
+    <div class="payees">
+      <h3 class="tc-head"><span class="ico">👥</span> Sample payees</h3>
+      <p class="tc-sub">For the <b>Add a payee</b> step — all use BSB + account number.</p>
+      <div class="payee-list">
+        <div class="payee-row"><span class="ptype">Individual</span><span class="method">BSB</span><span class="acct">772-772 · 12345678</span></div>
+        <div class="payee-row"><span class="ptype">Business</span><span class="method">BSB</span><span class="acct">062-000 · 12345678</span></div>
+        <div class="payee-row"><span class="ptype">Business</span><span class="method">BSB</span><span class="acct">063-001 · 000123456</span></div>
+      </div>
+      <p class="kyc-tip" style="color: var(--text-soft);">Or add a payee by PayID — any valid email or mobile number.</p>
     </div>
 
     <div class="testcards">

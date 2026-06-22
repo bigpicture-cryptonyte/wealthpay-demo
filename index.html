@@ -356,6 +356,51 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
     .guide-link:hover { border-bottom-color: var(--blue-500); }
     .guide-link svg { width: 16px; height: 16px; }
 
+    .dev-tool {
+      margin: 32px auto 0;
+      max-width: 420px;
+      border: 1px dashed var(--pill-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      text-align: left;
+      background: rgba(255,255,255,.5);
+    }
+    .dev-tool-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .dev-tool-row { display: flex; gap: 8px; }
+    .dev-tool input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      font-size: 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--pill-border);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--text);
+    }
+    .dev-tool input:focus { outline: 2px solid var(--blue-400); outline-offset: 0; border-color: var(--blue-500); }
+    .dev-tool button {
+      font: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 16px;
+      border-radius: 9px;
+      background: var(--blue-500);
+      color: #fff;
+    }
+    .dev-tool button:hover { background: var(--blue-600); }
+    .dev-tool button:disabled { opacity: .6; cursor: default; }
+    .dev-tool-msg { display: block; margin-top: 10px; font-size: 13px; color: var(--text-dimmed); min-height: 18px; }
+    .dev-tool-msg.ok { color: #137a52; }
+    .dev-tool-msg.err { color: #c0392b; }
+
     @media (max-width: 720px) {
       .acct-chip { display: none; }
       .hero h1 { font-size: 30px; }
@@ -444,6 +489,14 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         Read the testing guide — features &amp; sample data
       </a>
+      <div class="dev-tool">
+        <span class="dev-tool-label">Dev tool · approve an account</span>
+        <div class="dev-tool-row">
+          <input id="approveEmail" type="email" placeholder="user@email.com" autocomplete="off" />
+          <button id="approveBtn" type="button">Approve</button>
+        </div>
+        <span id="approveMsg" class="dev-tool-msg"></span>
+      </div>
     </div>
   </main>
 
@@ -537,6 +590,47 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
 
       launchDemo.addEventListener("click", function () { handoff("demo"); });
       launchFresh.addEventListener("click", function () { handoff("fresh"); });
+
+      // ---- Dev tool: approve an existing account by email ----
+      // Calls the dev-only BFF endpoint /api/admin/approve-account, which flips
+      // the user's Airwallex account to ACTIVE (sandbox) and marks them VERIFIED.
+      var approveBtn = document.getElementById("approveBtn");
+      var approveEmail = document.getElementById("approveEmail");
+      var approveMsg = document.getElementById("approveMsg");
+      function apiBase() {
+        var cfg = window.WLTH_SSO || {};
+        return (cfg.ssoUrl || "").replace(/\/sso\/wlth\/?$/, "");
+      }
+      async function approve() {
+        var email = (approveEmail.value || "").trim();
+        approveMsg.className = "dev-tool-msg";
+        if (!email) { approveMsg.textContent = "Enter an email."; return; }
+        approveBtn.disabled = true;
+        approveMsg.textContent = "Approving…";
+        try {
+          var res = await fetch(apiBase() + "/admin/approve-account", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email })
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (res.ok) {
+            approveMsg.textContent = "✓ Approved — " + (data.kycStatus || "VERIFIED") +
+              " · " + (data.airwallexAccountId || "");
+            approveMsg.className = "dev-tool-msg ok";
+          } else {
+            approveMsg.textContent = "✗ " + ((data.error && data.error.message) || ("HTTP " + res.status));
+            approveMsg.className = "dev-tool-msg err";
+          }
+        } catch (e) {
+          approveMsg.textContent = "✗ " + e.message;
+          approveMsg.className = "dev-tool-msg err";
+        } finally {
+          approveBtn.disabled = false;
+        }
+      }
+      approveBtn.addEventListener("click", approve);
+      approveEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") approve(); });
 
       items.forEach(function (el) {
         el.addEventListener("click", function (e) {
