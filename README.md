@@ -18,17 +18,34 @@ access to that). It exists so we can demonstrate the full hand-off flow end-to-e
 > Note: there are no Pay pages here on purpose. Payments / payees / cards etc. live in the
 > separate **Pay frontend** repo — this shell only launches it.
 
-## Configure the redirect target
+## Sign-up page (`/signup`)
 
-The hand-off URL lives in one place at the top of [`index.html`](./index.html):
+[`signup.html`](./signup.html) is a standalone demo of the WLTH Pay customer sign-up, served at
+`/signup` (Vercel `cleanUrls`). It offers the two onboarding journeys from the WLTH onboarding doc:
+
+- **WLTH account** — registers directly with WLTH. Shows the Stage 1 account-registration form
+  (name, DOB, contact, residential address, password, T&Cs / Privacy consent) and ends on an
+  email-verification confirmation.
+- **WLTH / Juno Money account** — hands the customer off to Juno Money, which on-boards them and
+  shares their details back with WLTH.
+
+## Configure the redirect targets
+
+The hand-off URLs each live in one place at the top of their file:
 
 ```html
+<!-- index.html -->
 <script>
   window.PAY_REDIRECT_URL = "https://wealth-pay-web-ui.vercel.app/"; // deployed Pay frontend
 </script>
+
+<!-- signup.html -->
+<script>
+  window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org"; // Juno Money onboarding
+</script>
 ```
 
-Points to the deployed Pay frontend. Update it here if that URL ever changes.
+Update them here if either URL ever changes.
 
 ## Run locally
 
