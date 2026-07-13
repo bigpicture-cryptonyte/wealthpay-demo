@@ -23,9 +23,15 @@ access to that). It exists so we can demonstrate the full hand-off flow end-to-e
 [`signup.html`](./signup.html) is a standalone demo of the WLTH Pay customer sign-up, served at
 `/signup` (Vercel `cleanUrls`). It offers the two onboarding journeys from the WLTH onboarding doc:
 
-- **WLTH account** — registers directly with WLTH. Shows the Stage 1 account-registration form
-  (name, DOB, contact, residential address, password, T&Cs / Privacy consent) and ends on an
-  email-verification confirmation.
+- **WLTH account** — a click-through demo of the full WLTH-direct journey, prefilled at each step:
+  1. **Stage 1 – account registration** (name, DOB, contact, residential address, password, T&Cs /
+     Privacy consent). Hitting **Create account** "signs you in" to WLTH.
+  2. **Stage 2 – WLTH Pay business onboarding** (business details, activities, directors,
+     beneficial owners, authorised representative, supporting documents, declaration) — mirrors the
+     Airwallex Connected Accounts onboarding journey.
+  3. **Submit to Airwallex** opens a completion modal highlighting the data shared with Airwallex
+     (Connected Account created, onboarding data submitted via the Connected Accounts API) and the
+     KYB → WLTH Pay activation status.
 - **WLTH / Juno Money account** — hands the customer off to Juno Money, which on-boards them and
   shares their details back with WLTH.
 

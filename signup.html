@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WLTH Pay — Sign up</title>
-  <meta name="description" content="Create a WLTH account, or onboard through Juno Money. Demo sign-up for the WealthPay platform shell." />
+  <meta name="description" content="Create a WLTH account, complete WLTH Pay business onboarding, and see the data shared with Airwallex. Demo for the WealthPay platform shell." />
   <link rel="icon" href="data:," />
 
   <!-- ============================================================
@@ -30,9 +30,12 @@
       --blue-soft: #eef1ff;
       --border: #eceff0;
       --field-border: #d7dadf;
+      --chip-border: #d7dadf;
+      --chip-hover: #ececec;
       --danger: #d64545;
       --success: #04ca72;
       --shadow-panel: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+      --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
       --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -96,6 +99,32 @@
     .login-link { font-size: 14px; font-weight: 500; color: var(--text-dimmed); }
     .login-link:hover { color: var(--text); text-decoration: none; }
 
+    /* Logged-in cluster (shown after account creation) */
+    .right-cluster { display: flex; align-items: center; gap: 12px; }
+    .acct-chip {
+      display: flex; align-items: center; gap: 10px;
+      border: 1px solid var(--chip-border);
+      border-radius: 24px;
+      padding: 7px 12px 7px 8px;
+      font-size: 14px; font-weight: 500;
+      background: transparent;
+      transition: background .12s ease;
+    }
+    .acct-chip:hover { background: var(--chip-hover); }
+    .acct-badge {
+      width: 26px; height: 26px; border-radius: 9999px;
+      background: #e9eaec; color: var(--text-dimmed);
+      font-size: 11px; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .acct-chip .chev { color: var(--text-dimmed); width: 16px; height: 16px; }
+    .avatar {
+      width: 42px; height: 42px; border-radius: 9999px;
+      background: var(--text); color: #fff;
+      font-size: 14px; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
     /* ---------------- Layout ---------------- */
     main { display: flex; justify-content: center; padding: 32px 24px 80px; }
     .panel {
@@ -106,6 +135,7 @@
       box-shadow: var(--shadow-panel);
       padding: 40px;
     }
+    .panel.wide { max-width: 880px; }
     @media (max-width: 560px) { .panel { padding: 24px; } }
 
     .panel-head { margin-bottom: 24px; }
@@ -116,12 +146,8 @@
     /* ---------------- Option cards (choose account) ---------------- */
     .options { display: flex; flex-direction: column; gap: 16px; }
     .option {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: #f7f8f9;
-      border: 1px solid transparent;
-      border-radius: 20px;
+      display: block; width: 100%; text-align: left;
+      background: #f7f8f9; border: 1px solid transparent; border-radius: 20px;
       padding: 20px;
       transition: background .12s ease, border-color .12s ease;
     }
@@ -129,21 +155,18 @@
     .option .opt-icon {
       width: 44px; height: 44px;
       display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 9999px;
-      background: var(--blue-soft);
-      color: var(--blue-500);
+      border-radius: 9999px; background: var(--blue-soft); color: var(--blue-500);
     }
     .option .opt-icon svg { width: 20px; height: 20px; }
     .option .opt-title { margin-top: 14px; font-size: 16px; font-weight: 600; }
     .option .opt-sub { margin-top: 4px; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
     .option .opt-cta {
-      margin-top: 14px;
-      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 14px; display: inline-flex; align-items: center; gap: 6px;
       color: var(--blue-500); font-size: 14px; font-weight: 600;
     }
     .option .opt-cta svg { width: 16px; height: 16px; }
 
-    /* ---------------- Form ---------------- */
+    /* ---------------- Forms ---------------- */
     .back-btn {
       display: inline-flex; align-items: center; gap: 6px;
       color: var(--text-dimmed); font-size: 14px; font-weight: 500;
@@ -154,79 +177,157 @@
 
     form { display: flex; flex-direction: column; gap: 16px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
     .field { display: block; }
-    .field > .label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px; font-weight: 600;
-    }
+    .field > .label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
     .field .label .opt { font-weight: 400; color: var(--text-dimmed); }
     .field .label .req { color: var(--danger); }
-    .field input, .field select {
-      width: 100%;
-      font-family: inherit;
-      font-size: 14px;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--field-border);
-      border-radius: 12px;
-      padding: 10px 14px;
+    .field input, .field select, .field textarea {
+      width: 100%; font-family: inherit; font-size: 14px; color: var(--text);
+      background: var(--surface); border: 1px solid var(--field-border);
+      border-radius: 12px; padding: 10px 14px;
       transition: border-color .12s ease;
     }
-    .field input::placeholder { color: var(--text-muted); }
-    .field input:focus, .field select:focus { outline: none; border-color: var(--blue-500); }
+    .field textarea { resize: vertical; min-height: 64px; }
+    .field input::placeholder, .field textarea::placeholder { color: var(--text-muted); }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue-500); }
     .field .err { margin-top: 5px; font-size: 12px; color: var(--danger); display: none; }
     .field.invalid .err { display: block; }
     .field.invalid input { border-color: var(--danger); }
 
-    .check {
-      display: flex; align-items: flex-start; gap: 10px;
-      font-size: 14px; color: var(--text-dimmed);
-    }
+    .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-dimmed); }
     .check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--blue-500); flex-shrink: 0; }
 
     .btn-primary {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      width: 100%;
-      background: var(--blue-500);
-      color: #fff;
-      font-size: 16px; font-weight: 500;
-      padding: 13px 24px;
-      border-radius: 12px;
-      margin-top: 6px;
-      transition: background .15s ease, transform .1s ease;
+      width: 100%; background: var(--blue-500); color: #fff;
+      font-size: 16px; font-weight: 500; padding: 13px 24px; border-radius: 12px;
+      margin-top: 6px; transition: background .15s ease, transform .1s ease;
     }
     .btn-primary:hover { background: var(--blue-600); }
     .btn-primary:active { transform: translateY(1px); }
+    .btn-primary svg { width: 18px; height: 18px; }
 
-    /* ---------------- Verify screen ---------------- */
-    .verify { text-align: center; padding: 16px 0; }
-    .verify .icon {
-      width: 64px; height: 64px; margin: 0 auto;
+    /* ---------------- Onboarding-specific ---------------- */
+    .banner {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(4,202,114,.1); color: #0a8a52;
+      border: 1px solid rgba(4,202,114,.25);
+      border-radius: 14px; padding: 12px 16px; margin-bottom: 24px;
+      font-size: 14px; font-weight: 500;
+    }
+    .banner svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    .section { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 8px; }
+    .section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+    .section-title { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 600; }
+    .section-num {
+      width: 24px; height: 24px; border-radius: 8px;
+      background: var(--blue-soft); color: var(--blue-500);
+      font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .section-sub { margin: 4px 0 16px 34px; color: var(--text-dimmed); font-size: 13px; }
+    .section > form, .section .fields { display: flex; flex-direction: column; gap: 16px; }
+
+    .person {
+      background: #f7f8f9; border: 1px solid var(--border); border-radius: 16px;
+      padding: 18px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .person + .person { margin-top: 14px; }
+    .person-head { font-size: 13px; font-weight: 600; color: var(--text-dimmed); text-transform: uppercase; letter-spacing: .04em; }
+
+    .doc-list { display: flex; flex-direction: column; gap: 10px; }
+    .doc {
+      display: flex; align-items: center; gap: 12px;
+      background: #f7f8f9; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
+    }
+    .doc .doc-icon {
+      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      background: var(--blue-soft); color: var(--blue-500);
       display: inline-flex; align-items: center; justify-content: center;
-      border-radius: 9999px; background: var(--blue-soft); color: var(--blue-500);
     }
-    .verify .icon svg { width: 30px; height: 30px; }
-    .verify h1 { margin-top: 20px; font-size: 24px; font-weight: 600; }
-    .verify p { max-width: 380px; margin: 10px auto 0; color: var(--text-dimmed); font-size: 15px; line-height: 1.5; }
-    .verify .email { color: var(--text); font-weight: 600; }
-    .badge-ok {
-      margin-top: 24px;
-      display: inline-flex; align-items: center; gap: 6px;
+    .doc .doc-icon svg { width: 18px; height: 18px; }
+    .doc .doc-meta { flex: 1; min-width: 0; }
+    .doc .doc-label { display: block; font-size: 14px; font-weight: 500; }
+    .doc .doc-file { display: block; font-size: 12px; color: var(--text-dimmed); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .doc .doc-ok {
+      display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0;
+      color: var(--success); font-size: 12px; font-weight: 600;
+    }
+    .doc .doc-ok svg { width: 14px; height: 14px; }
+
+    /* ---------------- Completion modal ---------------- */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(20,24,33,.55);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; overflow-y: auto;
+    }
+    .modal {
+      width: 100%; max-width: 520px;
+      background: var(--surface); border-radius: 24px;
+      box-shadow: var(--shadow-menu); padding: 32px;
+      animation: pop .16s ease;
+    }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    .modal .m-icon {
+      width: 60px; height: 60px; margin: 0 auto; border-radius: 9999px;
       background: rgba(4,202,114,.12); color: var(--success);
-      font-size: 14px; font-weight: 600;
-      padding: 7px 14px; border-radius: 9999px;
+      display: inline-flex; align-items: center; justify-content: center;
     }
-    .badge-ok svg { width: 16px; height: 16px; }
+    .modal .m-icon svg { width: 30px; height: 30px; }
+    .modal h2 { margin-top: 18px; text-align: center; font-size: 22px; font-weight: 600; }
+    .modal .m-sub { margin: 8px auto 0; max-width: 400px; text-align: center; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
+
+    .share {
+      margin-top: 22px; border: 1px solid #dbe2fb; background: var(--blue-soft);
+      border-radius: 16px; padding: 16px;
+    }
+    .share-head {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; color: var(--blue-500);
+      text-transform: uppercase; letter-spacing: .04em; margin-bottom: 10px;
+    }
+    .share-head svg { width: 16px; height: 16px; }
+    .share-row {
+      display: flex; justify-content: space-between; gap: 12px;
+      padding: 7px 0; font-size: 14px; border-top: 1px solid rgba(20,69,199,.12);
+    }
+    .share-row:first-of-type { border-top: none; }
+    .share-row .k { color: var(--text-dimmed); }
+    .share-row .v { font-weight: 600; text-align: right; }
+
+    .timeline { margin-top: 20px; display: flex; flex-direction: column; gap: 0; }
+    .tl-item { display: flex; gap: 12px; }
+    .tl-rail { display: flex; flex-direction: column; align-items: center; }
+    .tl-dot {
+      width: 22px; height: 22px; border-radius: 9999px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .tl-dot.done { background: var(--success); color: #fff; }
+    .tl-dot.active { background: var(--blue-soft); color: var(--blue-500); border: 2px solid var(--blue-500); }
+    .tl-dot.todo { background: #e9eaec; color: var(--text-muted); border: 2px solid var(--field-border); }
+    .tl-dot svg { width: 12px; height: 12px; }
+    .tl-line { width: 2px; flex: 1; background: var(--border); min-height: 14px; }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-body { padding-bottom: 14px; }
+    .tl-item:last-child .tl-body { padding-bottom: 0; }
+    .tl-title { font-size: 14px; font-weight: 600; }
+    .tl-desc { font-size: 12.5px; color: var(--text-dimmed); margin-top: 1px; }
+    .spin { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal .m-actions { margin-top: 24px; }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="demo-bar">
-    <b>WLTH Pay — Demo sign-up.</b> Choose <b>WLTH</b> to register directly, or <b>WLTH / Juno Money</b> to onboard through Juno.
+    <b>WLTH Pay — Demo sign-up.</b> WLTH account is <b>prefilled</b> — click through to see the WLTH Pay onboarding and the data shared with Airwallex.
   </div>
 
   <header>
@@ -234,13 +335,23 @@
       <span class="logo">WLTH</span>
       <span class="demo-tag">Demo</span>
       <div class="spacer"></div>
-      <a class="login-link" href="/">Log in</a>
+      <!-- Logged-out -->
+      <a class="login-link" id="login-link" href="/">Log in</a>
+      <!-- Logged-in (revealed after account creation) -->
+      <div class="right-cluster hidden" id="acct-cluster">
+        <button class="acct-chip">
+          <span class="acct-badge">AC</span>
+          Acme Corp Pty Ltd
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="avatar">JD</div>
+      </div>
     </div>
   </header>
 
   <main>
-    <div class="panel">
-      <!-- Step 1: choose account type -->
+    <div class="panel" id="panel">
+      <!-- ============ Step 1: choose account type ============ -->
       <section id="step-choose">
         <div class="panel-head center">
           <h1>Create your account</h1>
@@ -273,74 +384,74 @@
         </div>
       </section>
 
-      <!-- Step 2: WLTH registration form -->
-      <section id="step-form" class="hidden">
+      <!-- ============ Step 2: WLTH registration (prefilled) ============ -->
+      <section id="step-signup" class="hidden">
         <button class="back-btn" id="back-to-choose">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
           Back
         </button>
         <div class="panel-head">
           <h1>Create your WLTH account</h1>
-          <p>Every customer first creates a WLTH account. You’ll apply for WLTH Pay after verifying your email.</p>
+          <p>Every customer first creates a WLTH account. Details are prefilled for this demo — hit Create account to sign in.</p>
         </div>
 
-        <form id="wlth-form" novalidate>
+        <form id="signup-form" novalidate>
           <div class="grid-2">
             <label class="field">
               <span class="label">First name <span class="req">*</span></span>
-              <input name="firstName" required placeholder="Jane" />
+              <input name="firstName" required value="Jane" />
               <span class="err">Required</span>
             </label>
             <label class="field">
               <span class="label">Middle name <span class="opt">(optional)</span></span>
-              <input name="middleName" placeholder="Alex" />
+              <input name="middleName" value="" placeholder="Alex" />
             </label>
             <label class="field">
               <span class="label">Last name <span class="req">*</span></span>
-              <input name="lastName" required placeholder="Doe" />
+              <input name="lastName" required value="Doe" />
               <span class="err">Required</span>
             </label>
             <label class="field">
               <span class="label">Date of birth <span class="req">*</span></span>
-              <input name="dob" type="date" required />
+              <input name="dob" type="date" required value="1990-05-14" />
               <span class="err">Required</span>
             </label>
             <label class="field">
               <span class="label">Email address <span class="req">*</span></span>
-              <input name="email" type="email" required placeholder="jane@example.com" />
+              <input name="email" type="email" required value="jane.doe@acmepay.com.au" />
               <span class="err">Enter a valid email</span>
             </label>
             <label class="field">
               <span class="label">Mobile number <span class="req">*</span></span>
-              <input name="mobile" type="tel" required placeholder="+61 400 000 000" />
+              <input name="mobile" type="tel" required value="+61 400 123 456" />
               <span class="err">Required</span>
             </label>
           </div>
 
           <label class="field">
             <span class="label">Residential address <span class="req">*</span></span>
-            <input name="address" required placeholder="123 Example St" />
+            <input name="address" required value="123 George Street" />
             <span class="err">Required</span>
           </label>
 
           <div class="grid-2">
             <label class="field">
               <span class="label">Suburb <span class="req">*</span></span>
-              <input name="suburb" required placeholder="Sydney" />
+              <input name="suburb" required value="Sydney" />
               <span class="err">Required</span>
             </label>
             <label class="field">
               <span class="label">State <span class="req">*</span></span>
               <select name="state" required>
                 <option value="">Select state</option>
-                <option>ACT</option><option>NSW</option><option>NT</option><option>QLD</option>
+                <option>ACT</option><option selected>NSW</option><option>NT</option><option>QLD</option>
                 <option>SA</option><option>TAS</option><option>VIC</option><option>WA</option>
               </select>
               <span class="err">Required</span>
             </label>
             <label class="field">
               <span class="label">Postcode <span class="req">*</span></span>
-              <input name="postcode" required inputmode="numeric" pattern="\d{4}" placeholder="2000" />
+              <input name="postcode" required inputmode="numeric" pattern="\d{4}" value="2000" />
               <span class="err">4-digit postcode</span>
             </label>
             <label class="field">
@@ -356,63 +467,283 @@
           <div class="grid-2">
             <label class="field">
               <span class="label">Password <span class="req">*</span></span>
-              <input name="password" type="password" required minlength="8" placeholder="••••••••" />
+              <input name="password" type="password" required minlength="8" value="Passw0rd!" />
               <span class="err">At least 8 characters</span>
             </label>
             <label class="field">
               <span class="label">Confirm password <span class="req">*</span></span>
-              <input name="confirmPassword" type="password" required minlength="8" placeholder="••••••••" />
+              <input name="confirmPassword" type="password" required minlength="8" value="Passw0rd!" />
               <span class="err">Passwords do not match</span>
             </label>
           </div>
 
           <label class="check">
-            <input type="checkbox" name="terms" required />
+            <input type="checkbox" name="terms" required checked />
             <span>I accept the <a href="#" onclick="return false">Terms &amp; Conditions</a></span>
           </label>
           <label class="check">
-            <input type="checkbox" name="privacy" required />
+            <input type="checkbox" name="privacy" required checked />
             <span>I accept the <a href="#" onclick="return false">Privacy Policy</a></span>
           </label>
 
-          <button type="submit" class="btn-primary">Create account</button>
+          <button type="submit" class="btn-primary">
+            Create account
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
         </form>
       </section>
 
-      <!-- Step 3: email verification confirmation -->
-      <section id="step-verify" class="hidden">
-        <div class="verify">
-          <span class="icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          </span>
-          <h1>Verify your email</h1>
-          <p>We’ve sent a verification link to <span class="email" id="verify-email">your email address</span>. Verify it to finish creating your WLTH account, then apply for WLTH Pay.</p>
-          <span class="badge-ok">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-            Account created
-          </span>
+      <!-- ============ Step 3: WLTH Pay business onboarding (logged in, prefilled) ============ -->
+      <section id="step-onboarding" class="hidden">
+        <div class="banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          WLTH account created — you’re signed in as <b>&nbsp;Jane Doe</b>. Complete WLTH Pay onboarding to activate.
         </div>
+        <div class="panel-head">
+          <h1>WLTH Pay business onboarding</h1>
+          <p>This mirrors the Airwallex Connected Accounts onboarding journey. Prefilled for the demo — review and submit to Airwallex.</p>
+        </div>
+
+        <form id="onboarding-form" novalidate>
+          <!-- Section 1 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">1</span> Business details</div>
+            <div class="section-sub">Registered entity and contact information.</div>
+            <div class="fields">
+              <div class="grid-2">
+                <label class="field"><span class="label">Legal business name</span><input name="legalName" value="Acme Corp Pty Ltd" /></label>
+                <label class="field"><span class="label">Trading name</span><input name="tradingName" value="Acme Pay" /></label>
+                <label class="field"><span class="label">ABN</span><input name="abn" value="51 824 753 556" /></label>
+                <label class="field"><span class="label">ACN</span><input name="acn" value="824 753 556" /></label>
+                <label class="field"><span class="label">Business structure</span>
+                  <select name="structure">
+                    <option selected>Private Company (Pty Ltd)</option>
+                    <option>Sole Trader</option><option>Partnership</option><option>Trust</option><option>Public Company</option>
+                  </select>
+                </label>
+                <label class="field"><span class="label">Industry / ANZSIC</span><input name="industry" value="5420 – Software Publishing" /></label>
+              </div>
+              <label class="field"><span class="label">Business description</span><textarea name="description">Subscription software and integrated payments for Australian SMEs.</textarea></label>
+              <div class="grid-2">
+                <label class="field"><span class="label">Date established</span><input name="established" type="date" value="2018-03-01" /></label>
+                <label class="field"><span class="label">Website</span><input name="website" value="https://acmepay.com.au" /></label>
+                <label class="field"><span class="label">Registered business address</span><input name="registeredAddress" value="123 George Street, Sydney NSW 2000" /></label>
+                <label class="field"><span class="label">Trading address</span><input name="tradingAddress" value="123 George Street, Sydney NSW 2000" /></label>
+                <label class="field"><span class="label">Business email</span><input name="businessEmail" type="email" value="accounts@acmepay.com.au" /></label>
+                <label class="field"><span class="label">Business telephone</span><input name="businessPhone" type="tel" value="+61 2 8000 1234" /></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">2</span> Business activities</div>
+            <div class="section-sub">Products, processing volumes and currencies.</div>
+            <div class="fields">
+              <label class="field"><span class="label">Products and services</span><input name="products" value="Subscription software and payment processing" /></label>
+              <div class="grid-2">
+                <label class="field"><span class="label">Expected monthly processing volume</span><input name="monthlyVolume" value="A$250,000" /></label>
+                <label class="field"><span class="label">Expected annual turnover</span><input name="annualTurnover" value="A$3,000,000" /></label>
+                <label class="field"><span class="label">Average transaction value</span><input name="avgTxn" value="A$450" /></label>
+                <label class="field"><span class="label">Maximum transaction value</span><input name="maxTxn" value="A$25,000" /></label>
+                <label class="field"><span class="label">Countries of operation</span><input name="countries" value="Australia, New Zealand" /></label>
+                <label class="field"><span class="label">Currencies to be processed</span><input name="currencies" value="AUD, NZD, USD" /></label>
+              </div>
+              <label class="field"><span class="label">Purpose of WLTH Pay account</span><input name="purpose" value="Collect customer payments and settle supplier invoices" /></label>
+            </div>
+          </div>
+
+          <!-- Section 3 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">3</span> Company representatives (directors)</div>
+            <div class="section-sub">Directors of the business.</div>
+            <div class="person" data-kind="director">
+              <div class="person-head">Director 1</div>
+              <div class="grid-2">
+                <label class="field"><span class="label">Full name</span><input value="Jane Doe" /></label>
+                <label class="field"><span class="label">Date of birth</span><input type="date" value="1990-05-14" /></label>
+                <label class="field"><span class="label">Email address</span><input type="email" value="jane.doe@acmepay.com.au" /></label>
+                <label class="field"><span class="label">Mobile number</span><input type="tel" value="+61 400 123 456" /></label>
+                <label class="field"><span class="label">Position within company</span><input value="Director" /></label>
+                <label class="field"><span class="label">Residential address</span><input value="123 George Street, Sydney NSW 2000" /></label>
+              </div>
+            </div>
+            <div class="person" data-kind="director">
+              <div class="person-head">Director 2</div>
+              <div class="grid-2">
+                <label class="field"><span class="label">Full name</span><input value="John Smith" /></label>
+                <label class="field"><span class="label">Date of birth</span><input type="date" value="1985-11-02" /></label>
+                <label class="field"><span class="label">Email address</span><input type="email" value="john.smith@acmepay.com.au" /></label>
+                <label class="field"><span class="label">Mobile number</span><input type="tel" value="+61 400 987 654" /></label>
+                <label class="field"><span class="label">Position within company</span><input value="Director" /></label>
+                <label class="field"><span class="label">Residential address</span><input value="45 King Street, Melbourne VIC 3000" /></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">4</span> Ultimate beneficial owners (25%+)</div>
+            <div class="section-sub">Individuals owning 25% or more of the business.</div>
+            <div class="person" data-kind="ubo">
+              <div class="person-head">Beneficial owner 1</div>
+              <div class="grid-2">
+                <label class="field"><span class="label">Full name</span><input value="Jane Doe" /></label>
+                <label class="field"><span class="label">Ownership percentage</span><input value="60%" /></label>
+                <label class="field"><span class="label">Date of birth</span><input type="date" value="1990-05-14" /></label>
+                <label class="field"><span class="label">Residential address</span><input value="123 George Street, Sydney NSW 2000" /></label>
+              </div>
+            </div>
+            <div class="person" data-kind="ubo">
+              <div class="person-head">Beneficial owner 2</div>
+              <div class="grid-2">
+                <label class="field"><span class="label">Full name</span><input value="John Smith" /></label>
+                <label class="field"><span class="label">Ownership percentage</span><input value="40%" /></label>
+                <label class="field"><span class="label">Date of birth</span><input type="date" value="1985-11-02" /></label>
+                <label class="field"><span class="label">Residential address</span><input value="45 King Street, Melbourne VIC 3000" /></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">5</span> Authorised representative</div>
+            <div class="section-sub">Person authorised to act on behalf of the business.</div>
+            <div class="fields">
+              <div class="grid-2">
+                <label class="field"><span class="label">Full name</span><input name="repName" value="Jane Doe" /></label>
+                <label class="field"><span class="label">Role / position</span><input name="repRole" value="Director & CEO" /></label>
+                <label class="field"><span class="label">Email address</span><input name="repEmail" type="email" value="jane.doe@acmepay.com.au" /></label>
+                <label class="field"><span class="label">Mobile number</span><input name="repMobile" type="tel" value="+61 400 123 456" /></label>
+              </div>
+              <label class="check">
+                <input type="checkbox" name="repAuthority" checked />
+                <span>I am authorised to act on behalf of the business.</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 6 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">6</span> Supporting documents</div>
+            <div class="section-sub">Uploaded for KYB verification.</div>
+            <div class="doc-list">
+              <div class="doc">
+                <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+                <span class="doc-meta"><span class="doc-label">ASIC company extract</span><span class="doc-file">acme-asic-extract.pdf</span></span>
+                <span class="doc-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Uploaded</span>
+              </div>
+              <div class="doc">
+                <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+                <span class="doc-meta"><span class="doc-label">Proof of business address</span><span class="doc-file">acme-lease-agreement.pdf</span></span>
+                <span class="doc-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Uploaded</span>
+              </div>
+              <div class="doc">
+                <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+                <span class="doc-meta"><span class="doc-label">Identification — directors</span><span class="doc-file">jane-doe-passport.pdf</span></span>
+                <span class="doc-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Uploaded</span>
+              </div>
+              <div class="doc">
+                <span class="doc-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg></span>
+                <span class="doc-meta"><span class="doc-label">Identification — beneficial owners</span><span class="doc-file">john-smith-drivers-licence.pdf</span></span>
+                <span class="doc-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Uploaded</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 7 -->
+          <div class="section">
+            <div class="section-title"><span class="section-num">7</span> Review &amp; declaration</div>
+            <div class="section-sub">Confirm and authorise submission to Airwallex.</div>
+            <div class="fields">
+              <label class="check"><input type="checkbox" checked /> <span>I have reviewed the information above and confirm it is accurate.</span></label>
+              <label class="check"><input type="checkbox" checked /> <span>I accept the WLTH Pay declarations.</span></label>
+              <label class="check"><input type="checkbox" checked /> <span>I authorise WLTH to submit this information to Airwallex for verification.</span></label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">
+            Submit to Airwallex
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+          </button>
+        </form>
       </section>
     </div>
   </main>
 
+  <!-- ============ Completion modal: data shared with Airwallex ============ -->
+  <div class="modal-overlay hidden" id="completion">
+    <div class="modal">
+      <span class="m-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </span>
+      <h2>Submitted for WLTH Pay activation</h2>
+      <p class="m-sub">WLTH created a Connected Account in Airwallex and securely shared your onboarding details via the Connected Accounts API.</p>
+
+      <div class="share">
+        <div class="share-head">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+          Shared with Airwallex
+        </div>
+        <div class="share-row"><span class="k">Business details</span><span class="v" id="s-business">—</span></div>
+        <div class="share-row"><span class="k">Business activities</span><span class="v" id="s-activity">—</span></div>
+        <div class="share-row"><span class="k">Directors &amp; representatives</span><span class="v" id="s-directors">—</span></div>
+        <div class="share-row"><span class="k">Beneficial owners (25%+)</span><span class="v" id="s-ubos">—</span></div>
+        <div class="share-row"><span class="k">Supporting documents</span><span class="v" id="s-docs">—</span></div>
+      </div>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-rail"><span class="tl-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="tl-line"></span></div>
+          <div class="tl-body"><div class="tl-title">Connected Account created</div><div class="tl-desc">WLTH created your Airwallex Connected Account.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-rail"><span class="tl-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="tl-line"></span></div>
+          <div class="tl-body"><div class="tl-title">Onboarding data submitted</div><div class="tl-desc">Business, representatives, owners &amp; documents sent via the Connected Accounts API.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-rail"><span class="tl-dot active"><svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span><span class="tl-line"></span></div>
+          <div class="tl-body"><div class="tl-title">Airwallex KYB in review</div><div class="tl-desc">Airwallex is running KYB, sanctions, compliance &amp; risk checks.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-rail"><span class="tl-dot todo"></span></div>
+          <div class="tl-body"><div class="tl-title">WLTH Pay activated</div><div class="tl-desc">Once approved, WLTH enables WLTH Pay for your account.</div></div>
+        </div>
+      </div>
+
+      <div class="m-actions">
+        <button class="btn-primary" id="modal-done">Done</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
+      var panel = document.getElementById("panel");
       var stepChoose = document.getElementById("step-choose");
-      var stepForm = document.getElementById("step-form");
-      var stepVerify = document.getElementById("step-verify");
-      var form = document.getElementById("wlth-form");
+      var stepSignup = document.getElementById("step-signup");
+      var stepOnboarding = document.getElementById("step-onboarding");
+      var completion = document.getElementById("completion");
+      var loginLink = document.getElementById("login-link");
+      var acctCluster = document.getElementById("acct-cluster");
+      var signupForm = document.getElementById("signup-form");
+      var onboardingForm = document.getElementById("onboarding-form");
 
-      function show(el) {
-        [stepChoose, stepForm, stepVerify].forEach(function (s) { s.classList.add("hidden"); });
+      function show(el, wide) {
+        [stepChoose, stepSignup, stepOnboarding].forEach(function (s) { s.classList.add("hidden"); });
         el.classList.remove("hidden");
+        panel.classList.toggle("wide", !!wide);
         window.scrollTo(0, 0);
       }
+      function setLoggedIn(yes) {
+        loginLink.classList.toggle("hidden", yes);
+        acctCluster.classList.toggle("hidden", !yes);
+      }
 
-      // WLTH direct → registration form
-      document.getElementById("opt-wlth").addEventListener("click", function () { show(stepForm); });
+      // WLTH direct -> registration form
+      document.getElementById("opt-wlth").addEventListener("click", function () { show(stepSignup); });
 
-      // WLTH / Juno Money → hand off to Juno (1b journey)
+      // WLTH / Juno Money -> hand off to Juno (1b journey)
       document.getElementById("opt-juno").addEventListener("click", function () {
         window.location.href = window.JUNO_REDIRECT_URL;
       });
@@ -424,36 +755,49 @@
         if (field) field.classList.toggle("invalid", invalid);
       }
 
-      form.addEventListener("submit", function (e) {
+      // Create account -> validate -> "log in" and show onboarding
+      signupForm.addEventListener("submit", function (e) {
         e.preventDefault();
         var valid = true;
-
-        // Native constraint validation per control (required / type / pattern / minlength)
-        form.querySelectorAll("input, select").forEach(function (el) {
-          if (el.type === "checkbox") return; // handled below
+        signupForm.querySelectorAll("input, select").forEach(function (el) {
+          if (el.type === "checkbox") return;
           var ok = el.checkValidity();
           markField(el, !ok);
           if (!ok) valid = false;
         });
-
-        // Passwords must match
-        var pw = form.password.value;
-        var cpw = form.confirmPassword.value;
-        if (pw && cpw && pw !== cpw) {
-          markField(form.confirmPassword, true);
-          valid = false;
+        if (signupForm.password.value && signupForm.confirmPassword.value &&
+            signupForm.password.value !== signupForm.confirmPassword.value) {
+          markField(signupForm.confirmPassword, true); valid = false;
         }
-
-        // Both consent checkboxes required
-        if (!form.terms.checked || !form.privacy.checked) {
-          valid = false;
-          if (!form.terms.checked) form.terms.focus();
-        }
-
+        if (!signupForm.terms.checked || !signupForm.privacy.checked) valid = false;
         if (!valid) return;
 
-        document.getElementById("verify-email").textContent = form.email.value;
-        show(stepVerify);
+        setLoggedIn(true);       // signed into WLTH
+        show(stepOnboarding, true);
+      });
+
+      // Submit to Airwallex -> completion modal with the shared data
+      onboardingForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var f = onboardingForm;
+        var directors = onboardingForm.querySelectorAll('.person[data-kind="director"]').length;
+        var ubos = onboardingForm.querySelectorAll('.person[data-kind="ubo"]').length;
+        var docs = onboardingForm.querySelectorAll('.doc').length;
+
+        document.getElementById("s-business").textContent = f.legalName.value + " · ABN " + f.abn.value;
+        document.getElementById("s-activity").textContent = f.monthlyVolume.value + "/mo · " + f.currencies.value;
+        document.getElementById("s-directors").textContent = directors + (directors === 1 ? " person" : " people");
+        document.getElementById("s-ubos").textContent = ubos + (ubos === 1 ? " owner" : " owners");
+        document.getElementById("s-docs").textContent = docs + " files";
+
+        completion.classList.remove("hidden");
+      });
+
+      // Done -> reset the demo to the start
+      document.getElementById("modal-done").addEventListener("click", function () {
+        completion.classList.add("hidden");
+        setLoggedIn(false);
+        show(stepChoose);
       });
     })();
   </script>
