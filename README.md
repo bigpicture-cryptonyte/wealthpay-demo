@@ -26,9 +26,9 @@ access to that). It exists so we can demonstrate the full hand-off flow end-to-e
 - **WLTH account** — a click-through demo of the full WLTH-direct journey, prefilled at each step:
   1. **Stage 1 – account registration** (name, DOB, contact, residential address, password, T&Cs /
      Privacy consent). Hitting **Create account** "signs you in" to WLTH.
-  2. **Stage 2 – WLTH Pay business onboarding** (business details, activities, directors,
-     beneficial owners, authorised representative, supporting documents, declaration) — mirrors the
-     Airwallex Connected Accounts onboarding journey.
+  2. **Stage 2 – WLTH Pay business onboarding** — a 7-step wizard inside one form (business
+     details, activities, directors, beneficial owners, authorised representative, supporting
+     documents, declaration) mirroring the Airwallex Connected Accounts onboarding journey.
   3. **Submit to Airwallex** opens a completion modal highlighting the data shared with Airwallex
      (Connected Account created, onboarding data submitted via the Connected Accounts API) and the
      KYB → WLTH Pay activation status.

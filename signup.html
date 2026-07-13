@@ -259,6 +259,44 @@
     }
     .doc .doc-ok svg { width: 14px; height: 14px; }
 
+    /* ---------------- Onboarding wizard ---------------- */
+    .wizard-head { margin-bottom: 26px; }
+    .steps { display: flex; align-items: center; }
+    .wstep { display: flex; align-items: center; }
+    .wstep:not(:last-child) { flex: 1; }
+    .wdot {
+      width: 30px; height: 30px; border-radius: 9999px; flex-shrink: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+    }
+    .wdot.done { background: var(--blue-500); color: #fff; }
+    .wdot.active { background: var(--blue-soft); color: var(--blue-500); border: 2px solid var(--blue-500); }
+    .wdot.todo { background: #eceff0; color: var(--text-muted); }
+    .wdot svg { width: 15px; height: 15px; }
+    .wbar { flex: 1; height: 2px; margin: 0 6px; background: var(--border); }
+    .wbar.done { background: var(--blue-500); }
+    .wizard-caption { margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--text-dimmed); letter-spacing: .04em; text-transform: uppercase; }
+    @media (max-width: 560px) {
+      .wdot { width: 26px; height: 26px; font-size: 12px; }
+      .wbar { margin: 0 3px; }
+    }
+
+    /* Each section becomes a wizard step — only one shows at a time */
+    .wizard-step { border-top: none !important; padding-top: 0 !important; margin-top: 0 !important; }
+
+    .wizard-nav { display: flex; gap: 12px; margin-top: 20px; }
+    .wizard-nav .btn-primary { flex: 1; margin-top: 0; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--field-border); border-radius: 12px;
+      font-size: 16px; font-weight: 500; padding: 13px 22px;
+      transition: background .12s ease;
+    }
+    .btn-secondary:hover { background: #f5f6f7; }
+    .btn-secondary:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-secondary svg { width: 18px; height: 18px; }
+
     /* ---------------- Completion modal ---------------- */
     .modal-overlay {
       position: fixed; inset: 0; z-index: 100;
@@ -504,9 +542,22 @@
           <p>This mirrors the Airwallex Connected Accounts onboarding journey. Prefilled for the demo — review and submit to Airwallex.</p>
         </div>
 
+        <div class="wizard-head">
+          <div class="steps" id="wiz-steps">
+            <div class="wstep"><span class="wdot">1</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">2</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">3</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">4</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">5</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">6</span><span class="wbar"></span></div>
+            <div class="wstep"><span class="wdot">7</span></div>
+          </div>
+          <div class="wizard-caption" id="wiz-caption">Step 1 of 7</div>
+        </div>
+
         <form id="onboarding-form" novalidate>
           <!-- Section 1 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">1</span> Business details</div>
             <div class="section-sub">Registered entity and contact information.</div>
             <div class="fields">
@@ -536,7 +587,7 @@
           </div>
 
           <!-- Section 2 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">2</span> Business activities</div>
             <div class="section-sub">Products, processing volumes and currencies.</div>
             <div class="fields">
@@ -554,7 +605,7 @@
           </div>
 
           <!-- Section 3 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">3</span> Company representatives (directors)</div>
             <div class="section-sub">Directors of the business.</div>
             <div class="person" data-kind="director">
@@ -582,7 +633,7 @@
           </div>
 
           <!-- Section 4 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">4</span> Ultimate beneficial owners (25%+)</div>
             <div class="section-sub">Individuals owning 25% or more of the business.</div>
             <div class="person" data-kind="ubo">
@@ -606,7 +657,7 @@
           </div>
 
           <!-- Section 5 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">5</span> Authorised representative</div>
             <div class="section-sub">Person authorised to act on behalf of the business.</div>
             <div class="fields">
@@ -624,7 +675,7 @@
           </div>
 
           <!-- Section 6 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">6</span> Supporting documents</div>
             <div class="section-sub">Uploaded for KYB verification.</div>
             <div class="doc-list">
@@ -652,7 +703,7 @@
           </div>
 
           <!-- Section 7 -->
-          <div class="section">
+          <div class="section wizard-step">
             <div class="section-title"><span class="section-num">7</span> Review &amp; declaration</div>
             <div class="section-sub">Confirm and authorise submission to Airwallex.</div>
             <div class="fields">
@@ -662,10 +713,17 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-primary">
-            Submit to Airwallex
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
-          </button>
+          <div class="wizard-nav">
+            <button type="button" class="btn-secondary" id="wiz-back">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              Back
+            </button>
+            <button type="button" class="btn-primary" id="wiz-next">
+              <span id="wiz-label">Next</span>
+              <svg id="wiz-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              <svg id="wiz-send" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+            </button>
+          </div>
         </form>
       </section>
     </div>
@@ -773,30 +831,65 @@
         if (!valid) return;
 
         setLoggedIn(true);       // signed into WLTH
+        resetWizard();
         show(stepOnboarding, true);
       });
 
-      // Submit to Airwallex -> completion modal with the shared data
-      onboardingForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+      // ----- Onboarding wizard: the 7 sections are steps inside one form -----
+      var wizSteps = onboardingForm.querySelectorAll(".wizard-step");
+      var wizDots = document.querySelectorAll("#wiz-steps .wdot");
+      var wizBars = document.querySelectorAll("#wiz-steps .wbar");
+      var wizCaption = document.getElementById("wiz-caption");
+      var wizBack = document.getElementById("wiz-back");
+      var wizNext = document.getElementById("wiz-next");
+      var wizLabel = document.getElementById("wiz-label");
+      var wizArrow = document.getElementById("wiz-arrow");
+      var wizSend = document.getElementById("wiz-send");
+      var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      var current = 0;
+
+      function renderWizard() {
+        wizSteps.forEach(function (s, i) { s.classList.toggle("hidden", i !== current); });
+        wizDots.forEach(function (d, i) {
+          d.className = "wdot " + (i < current ? "done" : (i === current ? "active" : "todo"));
+          d.innerHTML = i < current ? CHECK : String(i + 1);
+        });
+        wizBars.forEach(function (b, i) { b.classList.toggle("done", i < current); });
+        var last = current === wizSteps.length - 1;
+        wizCaption.textContent = "Step " + (current + 1) + " of " + wizSteps.length;
+        wizBack.disabled = current === 0;
+        wizLabel.textContent = last ? "Submit to Airwallex" : "Next";
+        wizArrow.classList.toggle("hidden", last);
+        wizSend.classList.toggle("hidden", !last);
+        window.scrollTo(0, 0);
+      }
+      function resetWizard() { current = 0; renderWizard(); }
+
+      wizBack.addEventListener("click", function () { if (current > 0) { current--; renderWizard(); } });
+      wizNext.addEventListener("click", function () {
+        if (current < wizSteps.length - 1) { current++; renderWizard(); }
+        else openCompletion();
+      });
+
+      // Final step "Submit to Airwallex" -> completion modal with the shared data
+      function openCompletion() {
         var f = onboardingForm;
         var directors = onboardingForm.querySelectorAll('.person[data-kind="director"]').length;
         var ubos = onboardingForm.querySelectorAll('.person[data-kind="ubo"]').length;
         var docs = onboardingForm.querySelectorAll('.doc').length;
-
         document.getElementById("s-business").textContent = f.legalName.value + " · ABN " + f.abn.value;
         document.getElementById("s-activity").textContent = f.monthlyVolume.value + "/mo · " + f.currencies.value;
         document.getElementById("s-directors").textContent = directors + (directors === 1 ? " person" : " people");
         document.getElementById("s-ubos").textContent = ubos + (ubos === 1 ? " owner" : " owners");
         document.getElementById("s-docs").textContent = docs + " files";
-
         completion.classList.remove("hidden");
-      });
+      }
 
       // Done -> reset the demo to the start
       document.getElementById("modal-done").addEventListener("click", function () {
         completion.classList.add("hidden");
         setLoggedIn(false);
+        resetWizard();
         show(stepChoose);
       });
     })();
