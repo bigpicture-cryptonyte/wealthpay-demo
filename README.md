@@ -41,7 +41,7 @@ The hand-off URLs each live in one place at the top of their file:
 
 <!-- signup.html -->
 <script>
-  window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org"; // Juno Money onboarding
+  window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/bj3h8a2c3w"; // Juno Money onboarding
 </script>
 ```
 
