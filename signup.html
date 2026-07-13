@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>WLTH Pay — Sign up</title>
-  <meta name="description" content="Create a WLTH account, complete WLTH Pay business onboarding, and see the data shared with Airwallex. Demo for the WealthPay platform shell." />
+  <meta name="description" content="Create a WLTH account, complete WLTH Pay business onboarding, and submit for WLTH Pay activation. Demo for the WealthPay platform shell." />
   <link rel="icon" href="data:," />
 
   <!-- ============================================================
@@ -365,7 +365,7 @@
 </head>
 <body>
   <div class="demo-bar">
-    <b>WLTH Pay — Demo sign-up.</b> WLTH account is <b>prefilled</b> — click through to see the WLTH Pay onboarding and the data shared with Airwallex.
+    <b>WLTH Pay — Demo sign-up.</b> WLTH account is <b>prefilled</b> — click through to see the WLTH Pay onboarding and activation flow.
   </div>
 
   <header>
@@ -539,7 +539,7 @@
         </div>
         <div class="panel-head">
           <h1>WLTH Pay business onboarding</h1>
-          <p>This mirrors the Airwallex Connected Accounts onboarding journey. Prefilled for the demo — review and submit to Airwallex.</p>
+          <p>Provide your business details to activate WLTH Pay. Prefilled for the demo — review and submit.</p>
         </div>
 
         <div class="wizard-head">
@@ -705,11 +705,11 @@
           <!-- Section 7 -->
           <div class="section wizard-step">
             <div class="section-title"><span class="section-num">7</span> Review &amp; declaration</div>
-            <div class="section-sub">Confirm and authorise submission to Airwallex.</div>
+            <div class="section-sub">Confirm and authorise submission for verification.</div>
             <div class="fields">
               <label class="check"><input type="checkbox" checked /> <span>I have reviewed the information above and confirm it is accurate.</span></label>
               <label class="check"><input type="checkbox" checked /> <span>I accept the WLTH Pay declarations.</span></label>
-              <label class="check"><input type="checkbox" checked /> <span>I authorise WLTH to submit this information to Airwallex for verification.</span></label>
+              <label class="check"><input type="checkbox" checked /> <span>I authorise WLTH to submit this information for WLTH Pay verification.</span></label>
             </div>
           </div>
 
@@ -729,19 +729,19 @@
     </div>
   </main>
 
-  <!-- ============ Completion modal: data shared with Airwallex ============ -->
+  <!-- ============ Completion modal: submitted for WLTH Pay verification ============ -->
   <div class="modal-overlay hidden" id="completion">
     <div class="modal">
       <span class="m-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
       </span>
       <h2>Submitted for WLTH Pay activation</h2>
-      <p class="m-sub">WLTH created a Connected Account in Airwallex and securely shared your onboarding details via the Connected Accounts API.</p>
+      <p class="m-sub">Your onboarding details have been securely submitted to WLTH Pay and are now being verified.</p>
 
       <div class="share">
         <div class="share-head">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-          Shared with Airwallex
+          Submitted for verification
         </div>
         <div class="share-row"><span class="k">Business details</span><span class="v" id="s-business">—</span></div>
         <div class="share-row"><span class="k">Business activities</span><span class="v" id="s-activity">—</span></div>
@@ -753,19 +753,19 @@
       <div class="timeline">
         <div class="tl-item">
           <div class="tl-rail"><span class="tl-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="tl-line"></span></div>
-          <div class="tl-body"><div class="tl-title">Connected Account created</div><div class="tl-desc">WLTH created your Airwallex Connected Account.</div></div>
+          <div class="tl-body"><div class="tl-title">Application submitted</div><div class="tl-desc">Your onboarding details were submitted to WLTH Pay.</div></div>
         </div>
         <div class="tl-item">
           <div class="tl-rail"><span class="tl-dot done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="tl-line"></span></div>
-          <div class="tl-body"><div class="tl-title">Onboarding data submitted</div><div class="tl-desc">Business, representatives, owners &amp; documents sent via the Connected Accounts API.</div></div>
+          <div class="tl-body"><div class="tl-title">Details validated</div><div class="tl-desc">WLTH Pay validated your business, representatives, owners &amp; documents.</div></div>
         </div>
         <div class="tl-item">
           <div class="tl-rail"><span class="tl-dot active"><svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></span><span class="tl-line"></span></div>
-          <div class="tl-body"><div class="tl-title">Airwallex KYB in review</div><div class="tl-desc">Airwallex is running KYB, sanctions, compliance &amp; risk checks.</div></div>
+          <div class="tl-body"><div class="tl-title">Verification in progress</div><div class="tl-desc">WLTH Pay is running identity, compliance &amp; risk checks.</div></div>
         </div>
         <div class="tl-item">
           <div class="tl-rail"><span class="tl-dot todo"></span></div>
-          <div class="tl-body"><div class="tl-title">WLTH Pay activated</div><div class="tl-desc">Once approved, WLTH enables WLTH Pay for your account.</div></div>
+          <div class="tl-body"><div class="tl-title">WLTH Pay activated</div><div class="tl-desc">Once verification is complete, WLTH Pay is enabled for your account.</div></div>
         </div>
       </div>
 
@@ -858,7 +858,7 @@
         var last = current === wizSteps.length - 1;
         wizCaption.textContent = "Step " + (current + 1) + " of " + wizSteps.length;
         wizBack.disabled = current === 0;
-        wizLabel.textContent = last ? "Submit to Airwallex" : "Next";
+        wizLabel.textContent = last ? "Submit application" : "Next";
         wizArrow.classList.toggle("hidden", last);
         wizSend.classList.toggle("hidden", !last);
         window.scrollTo(0, 0);
@@ -871,7 +871,7 @@
         else openCompletion();
       });
 
-      // Final step "Submit to Airwallex" -> completion modal with the shared data
+      // Final step "Submit application" -> completion modal with the submitted data
       function openCompletion() {
         var f = onboardingForm;
         var directors = onboardingForm.querySelectorAll('.person[data-kind="director"]').length;

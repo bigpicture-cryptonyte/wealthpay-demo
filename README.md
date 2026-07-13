@@ -28,10 +28,9 @@ access to that). It exists so we can demonstrate the full hand-off flow end-to-e
      Privacy consent). Hitting **Create account** "signs you in" to WLTH.
   2. **Stage 2 – WLTH Pay business onboarding** — a 7-step wizard inside one form (business
      details, activities, directors, beneficial owners, authorised representative, supporting
-     documents, declaration) mirroring the Airwallex Connected Accounts onboarding journey.
-  3. **Submit to Airwallex** opens a completion modal highlighting the data shared with Airwallex
-     (Connected Account created, onboarding data submitted via the Connected Accounts API) and the
-     KYB → WLTH Pay activation status.
+     documents, declaration).
+  3. **Submit application** opens a completion modal summarising the details submitted for
+     WLTH Pay verification and the verification → WLTH Pay activation status.
 - **WLTH / Juno Money account** — hands the customer off to Juno Money, which on-boards them and
   shares their details back with WLTH.
 
