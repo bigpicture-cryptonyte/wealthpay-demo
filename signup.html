@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WLTH Pay — Sign up</title>
+  <meta name="description" content="Create a WLTH account, or onboard through Juno Money. Demo sign-up for the WealthPay platform shell." />
+  <link rel="icon" href="data:," />
+
+  <!-- ============================================================
+       DEMO CONFIG
+       JUNO_REDIRECT_URL is where the "WLTH / Juno Money" option
+       hands the customer off (Juno on-boards, then shares details
+       with WLTH — see the 1b customer journey).
+       ============================================================ -->
+  <script>
+    window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org";
+  </script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --surface: #ffffff;
+      --text: #292e3a;
+      --text-dimmed: #6f7682;
+      --text-muted: #8a909c;
+      --blue-500: #1445c7;
+      --blue-400: #3d6ae0;
+      --blue-600: #1039a8;
+      --blue-soft: #eef1ff;
+      --border: #eceff0;
+      --field-border: #d7dadf;
+      --danger: #d64545;
+      --success: #04ca72;
+      --shadow-panel: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+      --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--blue-500); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ---------------- Demo notice ---------------- */
+    .demo-bar {
+      background: var(--blue-soft);
+      color: var(--blue-500);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-bar b { font-weight: 600; }
+
+    /* ---------------- Header ---------------- */
+    header { height: 84px; display: flex; align-items: center; }
+    .header-inner {
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo {
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      color: var(--text);
+      user-select: none;
+    }
+    .demo-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--blue-500);
+      background: var(--blue-soft);
+      border: 1px solid #dbe2fb;
+      padding: 3px 8px;
+      border-radius: 9999px;
+    }
+    .spacer { flex: 1; }
+    .login-link { font-size: 14px; font-weight: 500; color: var(--text-dimmed); }
+    .login-link:hover { color: var(--text); text-decoration: none; }
+
+    /* ---------------- Layout ---------------- */
+    main { display: flex; justify-content: center; padding: 32px 24px 80px; }
+    .panel {
+      width: 100%;
+      max-width: 640px;
+      background: var(--surface);
+      border-radius: 24px;
+      box-shadow: var(--shadow-panel);
+      padding: 40px;
+    }
+    @media (max-width: 560px) { .panel { padding: 24px; } }
+
+    .panel-head { margin-bottom: 24px; }
+    .panel-head.center { text-align: center; }
+    .panel-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+    .panel-head p { margin-top: 6px; color: var(--text-dimmed); font-size: 15px; line-height: 1.5; }
+
+    /* ---------------- Option cards (choose account) ---------------- */
+    .options { display: flex; flex-direction: column; gap: 16px; }
+    .option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #f7f8f9;
+      border: 1px solid transparent;
+      border-radius: 20px;
+      padding: 20px;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .option:hover { background: #eef1ff; border-color: #dbe2fb; }
+    .option .opt-icon {
+      width: 44px; height: 44px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9999px;
+      background: var(--blue-soft);
+      color: var(--blue-500);
+    }
+    .option .opt-icon svg { width: 20px; height: 20px; }
+    .option .opt-title { margin-top: 14px; font-size: 16px; font-weight: 600; }
+    .option .opt-sub { margin-top: 4px; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
+    .option .opt-cta {
+      margin-top: 14px;
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--blue-500); font-size: 14px; font-weight: 600;
+    }
+    .option .opt-cta svg { width: 16px; height: 16px; }
+
+    /* ---------------- Form ---------------- */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--text-dimmed); font-size: 14px; font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .back-btn:hover { color: var(--text); }
+    .back-btn svg { width: 16px; height: 16px; }
+
+    form { display: flex; flex-direction: column; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .field { display: block; }
+    .field > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px; font-weight: 600;
+    }
+    .field .label .opt { font-weight: 400; color: var(--text-dimmed); }
+    .field .label .req { color: var(--danger); }
+    .field input, .field select {
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--field-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      transition: border-color .12s ease;
+    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--blue-500); }
+    .field .err { margin-top: 5px; font-size: 12px; color: var(--danger); display: none; }
+    .field.invalid .err { display: block; }
+    .field.invalid input { border-color: var(--danger); }
+
+    .check {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--text-dimmed);
+    }
+    .check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--blue-500); flex-shrink: 0; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      background: var(--blue-500);
+      color: #fff;
+      font-size: 16px; font-weight: 500;
+      padding: 13px 24px;
+      border-radius: 12px;
+      margin-top: 6px;
+      transition: background .15s ease, transform .1s ease;
+    }
+    .btn-primary:hover { background: var(--blue-600); }
+    .btn-primary:active { transform: translateY(1px); }
+
+    /* ---------------- Verify screen ---------------- */
+    .verify { text-align: center; padding: 16px 0; }
+    .verify .icon {
+      width: 64px; height: 64px; margin: 0 auto;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9999px; background: var(--blue-soft); color: var(--blue-500);
+    }
+    .verify .icon svg { width: 30px; height: 30px; }
+    .verify h1 { margin-top: 20px; font-size: 24px; font-weight: 600; }
+    .verify p { max-width: 380px; margin: 10px auto 0; color: var(--text-dimmed); font-size: 15px; line-height: 1.5; }
+    .verify .email { color: var(--text); font-weight: 600; }
+    .badge-ok {
+      margin-top: 24px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(4,202,114,.12); color: var(--success);
+      font-size: 14px; font-weight: 600;
+      padding: 7px 14px; border-radius: 9999px;
+    }
+    .badge-ok svg { width: 16px; height: 16px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="demo-bar">
+    <b>WLTH Pay — Demo sign-up.</b> Choose <b>WLTH</b> to register directly, or <b>WLTH / Juno Money</b> to onboard through Juno.
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <span class="logo">WLTH</span>
+      <span class="demo-tag">Demo</span>
+      <div class="spacer"></div>
+      <a class="login-link" href="/">Log in</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel">
+      <!-- Step 1: choose account type -->
+      <section id="step-choose">
+        <div class="panel-head center">
+          <h1>Create your account</h1>
+          <p>Choose how you’d like to get started with WLTH Pay.</p>
+        </div>
+        <div class="options">
+          <button class="option" id="opt-wlth">
+            <span class="opt-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+            </span>
+            <div class="opt-title">WLTH account</div>
+            <div class="opt-sub">Sign up directly with WLTH and complete WLTH Pay business onboarding.</div>
+            <span class="opt-cta">
+              Sign up with WLTH
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </button>
+
+          <button class="option" id="opt-juno">
+            <span class="opt-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>
+            </span>
+            <div class="opt-title">WLTH / Juno Money account</div>
+            <div class="opt-sub">Onboard through Juno Money — your details are shared with WLTH to create your account.</div>
+            <span class="opt-cta">
+              Continue with Juno Money
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: WLTH registration form -->
+      <section id="step-form" class="hidden">
+        <button class="back-btn" id="back-to-choose">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          Back
+        </button>
+        <div class="panel-head">
+          <h1>Create your WLTH account</h1>
+          <p>Every customer first creates a WLTH account. You’ll apply for WLTH Pay after verifying your email.</p>
+        </div>
+
+        <form id="wlth-form" novalidate>
+          <div class="grid-2">
+            <label class="field">
+              <span class="label">First name <span class="req">*</span></span>
+              <input name="firstName" required placeholder="Jane" />
+              <span class="err">Required</span>
+            </label>
+            <label class="field">
+              <span class="label">Middle name <span class="opt">(optional)</span></span>
+              <input name="middleName" placeholder="Alex" />
+            </label>
+            <label class="field">
+              <span class="label">Last name <span class="req">*</span></span>
+              <input name="lastName" required placeholder="Doe" />
+              <span class="err">Required</span>
+            </label>
+            <label class="field">
+              <span class="label">Date of birth <span class="req">*</span></span>
+              <input name="dob" type="date" required />
+              <span class="err">Required</span>
+            </label>
+            <label class="field">
+              <span class="label">Email address <span class="req">*</span></span>
+              <input name="email" type="email" required placeholder="jane@example.com" />
+              <span class="err">Enter a valid email</span>
+            </label>
+            <label class="field">
+              <span class="label">Mobile number <span class="req">*</span></span>
+              <input name="mobile" type="tel" required placeholder="+61 400 000 000" />
+              <span class="err">Required</span>
+            </label>
+          </div>
+
+          <label class="field">
+            <span class="label">Residential address <span class="req">*</span></span>
+            <input name="address" required placeholder="123 Example St" />
+            <span class="err">Required</span>
+          </label>
+
+          <div class="grid-2">
+            <label class="field">
+              <span class="label">Suburb <span class="req">*</span></span>
+              <input name="suburb" required placeholder="Sydney" />
+              <span class="err">Required</span>
+            </label>
+            <label class="field">
+              <span class="label">State <span class="req">*</span></span>
+              <select name="state" required>
+                <option value="">Select state</option>
+                <option>ACT</option><option>NSW</option><option>NT</option><option>QLD</option>
+                <option>SA</option><option>TAS</option><option>VIC</option><option>WA</option>
+              </select>
+              <span class="err">Required</span>
+            </label>
+            <label class="field">
+              <span class="label">Postcode <span class="req">*</span></span>
+              <input name="postcode" required inputmode="numeric" pattern="\d{4}" placeholder="2000" />
+              <span class="err">4-digit postcode</span>
+            </label>
+            <label class="field">
+              <span class="label">Country <span class="req">*</span></span>
+              <select name="country" required>
+                <option value="Australia" selected>Australia</option>
+                <option value="New Zealand">New Zealand</option>
+              </select>
+              <span class="err">Required</span>
+            </label>
+          </div>
+
+          <div class="grid-2">
+            <label class="field">
+              <span class="label">Password <span class="req">*</span></span>
+              <input name="password" type="password" required minlength="8" placeholder="••••••••" />
+              <span class="err">At least 8 characters</span>
+            </label>
+            <label class="field">
+              <span class="label">Confirm password <span class="req">*</span></span>
+              <input name="confirmPassword" type="password" required minlength="8" placeholder="••••••••" />
+              <span class="err">Passwords do not match</span>
+            </label>
+          </div>
+
+          <label class="check">
+            <input type="checkbox" name="terms" required />
+            <span>I accept the <a href="#" onclick="return false">Terms &amp; Conditions</a></span>
+          </label>
+          <label class="check">
+            <input type="checkbox" name="privacy" required />
+            <span>I accept the <a href="#" onclick="return false">Privacy Policy</a></span>
+          </label>
+
+          <button type="submit" class="btn-primary">Create account</button>
+        </form>
+      </section>
+
+      <!-- Step 3: email verification confirmation -->
+      <section id="step-verify" class="hidden">
+        <div class="verify">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </span>
+          <h1>Verify your email</h1>
+          <p>We’ve sent a verification link to <span class="email" id="verify-email">your email address</span>. Verify it to finish creating your WLTH account, then apply for WLTH Pay.</p>
+          <span class="badge-ok">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            Account created
+          </span>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var stepChoose = document.getElementById("step-choose");
+      var stepForm = document.getElementById("step-form");
+      var stepVerify = document.getElementById("step-verify");
+      var form = document.getElementById("wlth-form");
+
+      function show(el) {
+        [stepChoose, stepForm, stepVerify].forEach(function (s) { s.classList.add("hidden"); });
+        el.classList.remove("hidden");
+        window.scrollTo(0, 0);
+      }
+
+      // WLTH direct → registration form
+      document.getElementById("opt-wlth").addEventListener("click", function () { show(stepForm); });
+
+      // WLTH / Juno Money → hand off to Juno (1b journey)
+      document.getElementById("opt-juno").addEventListener("click", function () {
+        window.location.href = window.JUNO_REDIRECT_URL;
+      });
+
+      document.getElementById("back-to-choose").addEventListener("click", function () { show(stepChoose); });
+
+      function markField(input, invalid) {
+        var field = input.closest(".field");
+        if (field) field.classList.toggle("invalid", invalid);
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var valid = true;
+
+        // Native constraint validation per control (required / type / pattern / minlength)
+        form.querySelectorAll("input, select").forEach(function (el) {
+          if (el.type === "checkbox") return; // handled below
+          var ok = el.checkValidity();
+          markField(el, !ok);
+          if (!ok) valid = false;
+        });
+
+        // Passwords must match
+        var pw = form.password.value;
+        var cpw = form.confirmPassword.value;
+        if (pw && cpw && pw !== cpw) {
+          markField(form.confirmPassword, true);
+          valid = false;
+        }
+
+        // Both consent checkboxes required
+        if (!form.terms.checked || !form.privacy.checked) {
+          valid = false;
+          if (!form.terms.checked) form.terms.focus();
+        }
+
+        if (!valid) return;
+
+        document.getElementById("verify-email").textContent = form.email.value;
+        show(stepVerify);
+      });
+    })();
+  </script>
+</body>
+</html>
