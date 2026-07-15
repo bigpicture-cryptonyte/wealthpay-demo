@@ -70,5 +70,8 @@ window.WlthSso = (function () {
       window.open(cfg.ssoUrl + "?token=" + encodeURIComponent(token), "_blank", "noopener");
     } catch (e) { alert("Could not mint SSO token: " + e.message); }
   }
-  return { apiBase: apiBase, handoff: handoff };
+  // Persist the just-created demo account across pages (landing -> /home).
+  function saveAccount(a) { try { localStorage.setItem('wlthDemoAccount', JSON.stringify(a)); } catch (e) { /* ignore */ } }
+  function getAccount() { try { return JSON.parse(localStorage.getItem('wlthDemoAccount') || 'null'); } catch (e) { return null; } }
+  return { apiBase: apiBase, handoff: handoff, saveAccount: saveAccount, getAccount: getAccount };
 })();

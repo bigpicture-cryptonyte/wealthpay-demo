@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WLTH Pay — Sign up</title>
-  <meta name="description" content="Create a WLTH account (or onboard via Juno Money), then apply for WLTH Pay. Demo landing for the WealthPay platform." />
+  <title>WLTH — Sign up</title>
+  <meta name="description" content="Create a WLTH account, or onboard via Juno Money. Demo sign-up for the WLTH platform." />
   <link rel="icon" href="data:," />
 
   <!-- Shared WLTH SSO config + token minting (dev). Dev tools live at /dev. -->
@@ -146,7 +146,7 @@
 </head>
 <body>
   <div class="demo-bar">
-    <b>WLTH Pay — Demo sign-up.</b> Create a WLTH account (prefilled), then <b>Apply for WLTH Pay</b> to jump into onboarding on the dev Pay UI.
+    <b>WLTH — Demo sign-up.</b> The WLTH account form is prefilled — just hit <b>Create account</b>.
   </div>
 
   <header>
@@ -164,13 +164,13 @@
       <section id="step-choose">
         <div class="panel-head center">
           <h1>Create your account</h1>
-          <p>Choose how you’d like to get started with WLTH Pay.</p>
+          <p>Choose how you’d like to get started.</p>
         </div>
         <div class="options">
           <button class="option" id="opt-wlth">
             <span class="opt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
             <div class="opt-title">WLTH account</div>
-            <div class="opt-sub">Sign up directly with WLTH, then apply for WLTH Pay and complete business onboarding.</div>
+            <div class="opt-sub">Sign up directly with WLTH to create your account.</div>
             <span class="opt-cta">Sign up with WLTH <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
           </button>
           <button class="option" id="opt-juno">
@@ -226,10 +226,10 @@
     <div class="modal">
       <span class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
       <h2>WLTH account created</h2>
-      <p class="m-sub">Your account is ready. Apply for WLTH Pay to complete onboarding — we’ll prefill your details.</p>
+      <p class="m-sub">You’re all set — your WLTH account is ready. Continue to your home.</p>
       <p class="m-id" id="success-id"></p>
       <div class="m-actions">
-        <button class="btn-primary" id="apply-btn">Apply for WLTH Pay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="btn-primary" id="apply-btn">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
         <button class="btn-ghost" id="success-done">Not now</button>
       </div>
     </div>
@@ -243,7 +243,7 @@
       var signupForm = document.getElementById("signup-form");
       var createBtn = document.getElementById("create-btn");
 
-      // Captured after a successful signup — reused when "Apply for WLTH Pay" mints the token.
+      // Captured after a successful signup — saved and reused on the home page.
       var signup = null;
 
       function show(el) { [stepChoose, stepForm].forEach(function (s) { s.classList.add("hidden"); }); el.classList.remove("hidden"); window.scrollTo(0, 0); }
@@ -290,7 +290,7 @@
           if (res.ok) { var data = await res.json(); wlthId = data.wlthId; }
         } catch (e) { /* best-effort — fall back below so the demo still flows */ }
         // Fallback: if the temp API is unreachable, mint a local id so the hand-off
-        // still works (the Pay UI just won't find a draft to prefill).
+        // still works (the app just won't find a draft to prefill).
         if (!wlthId) wlthId = "wlth-" + crypto.randomUUID();
 
         signup = { wlthId: wlthId, email: body.email, name: [body.firstName, body.lastName].filter(Boolean).join(" ") || "New User" };
@@ -300,8 +300,11 @@
         successModal.classList.remove("hidden");
       });
 
+      // Account created -> save it and go to /home (mimics login), where the user
+      // continues into the app with this wlthId.
       document.getElementById("apply-btn").addEventListener("click", function () {
-        if (signup) window.WlthSso.handoff({ wlthId: signup.wlthId, email: signup.email, name: signup.name });
+        if (signup) window.WlthSso.saveAccount(signup);
+        window.location.href = "/home";
       });
       document.getElementById("success-done").addEventListener("click", function () { successModal.classList.add("hidden"); });
     })();

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WealthPay — Home</title>
+  <meta name="description" content="WealthPay platform home (demo). Select Pay from the product switcher to open WLTH Pay." />
+  <link rel="icon" href="data:," />
+
+  <script src="wlth-sso.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4; --surface: #ffffff; --text: #292e3a; --text-dimmed: #6f7682; --text-muted: #8a909c;
+      --blue-500: #1445c7; --blue-400: #3d6ae0; --blue-soft: #eef1ff; --brand-50: #eef2fc;
+      --border: #eceff0; --pill-border: #b8c5ca; --lightgrey-300: #eceff0; --lightgrey-400: #dde2e3;
+      --ink-soft: #4c5a68;
+      --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
+      --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    /* ---------------- Header (matches the Pay UI) ---------------- */
+    header { width: 100%; }
+    .header-inner { max-width: 1320px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .left, .right { display: flex; align-items: center; gap: 16px; }
+    .logo { height: 19px; width: auto; color: var(--text); }
+
+    /* Product switcher + right cluster live in white pills */
+    .pill { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: 9999px; padding: 8px 12px; }
+
+    .switcher { position: relative; }
+    .switch-trigger {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--pill-border); border-radius: 14px; background: transparent;
+      color: var(--text); padding: 8px 14px; font-size: 14px; font-weight: 500; transition: background .12s ease;
+    }
+    .switch-trigger:hover { background: var(--lightgrey-300); }
+    .switch-trigger .pi { width: 18px; height: 18px; color: var(--ink-soft); }
+    .switch-trigger .chev { width: 16px; height: 16px; color: var(--ink-soft); transition: transform .2s ease; }
+    .switcher.open .switch-trigger .chev { transform: rotate(180deg); }
+
+    .menu {
+      position: absolute; top: calc(100% + 8px); left: 0; min-width: 220px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      box-shadow: var(--shadow-menu); padding: 8px; display: none; flex-direction: column; gap: 2px; z-index: 50;
+    }
+    .switcher.open .menu { display: flex; }
+    .menu-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
+    .menu-item:hover { background: #f5f6f7; }
+    .menu-item svg { width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; }
+    .menu-item.current { background: var(--blue-soft); color: var(--blue-500); }
+    .menu-item.current svg { color: var(--blue-500); }
+
+    .org { display: flex; align-items: center; gap: 8px; border: 1px solid var(--pill-border); border-radius: 14px; background: transparent; padding: 7px 12px; font-size: 14px; font-weight: 500; color: var(--text); }
+    .org:hover { background: var(--lightgrey-300); }
+    .mono { width: 24px; height: 24px; border-radius: 9999px; background: var(--brand-50); color: var(--blue-500); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+    .org .chev { width: 16px; height: 16px; color: var(--ink-soft); }
+    .bell { position: relative; width: 36px; height: 36px; border-radius: 9999px; background: var(--ink-soft); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+    .bell svg { width: 16px; height: 16px; }
+    .bell::after { content: ""; position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 9999px; background: #42d996; border: 2px solid var(--ink-soft); }
+    .avatar { width: 36px; height: 36px; border-radius: 9999px; background: var(--text); color: #fff; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+
+    /* ---------------- Hero ---------------- */
+    main { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 90px 24px; }
+    .badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(66,217,150,.14); color: #0a8a52; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; }
+    .badge svg { width: 15px; height: 15px; }
+    h1 { margin-top: 18px; font-size: 40px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+    .sub { max-width: 540px; margin: 16px auto 0; color: var(--text-dimmed); font-size: 16px; line-height: 1.6; }
+    .signed { margin-top: 6px; font-size: 14px; color: var(--text-muted); }
+    .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--blue-500); color: #fff; font-size: 16px; font-weight: 500; padding: 14px 24px; border-radius: 12px; margin-top: 28px; transition: background .15s ease, transform .1s ease; }
+    .cta:hover { background: #1039a8; } .cta:active { transform: translateY(1px); }
+    .cta svg { width: 18px; height: 18px; }
+    .hint { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s ease; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    @media (max-width: 780px) { .org, .right .pill { } h1 { font-size: 30px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="left">
+        <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
+        <div class="pill">
+          <div class="switcher" id="switcher">
+            <button class="switch-trigger" id="switchTrigger" aria-haspopup="menu" aria-expanded="false">
+              <svg class="pi" id="pillIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+              <span id="pillLabel">Broker</span>
+              <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="menu" role="menu" aria-label="Products">
+              <button class="menu-item current" role="menuitem" data-product="broker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg> Broker</button>
+              <button class="menu-item" role="menuitem" data-product="pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg> Pay</button>
+              <button class="menu-item" role="menuitem" data-product="shareholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Shareholder</button>
+              <button class="menu-item" role="menuitem" data-product="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Dashboard</button>
+              <button class="menu-item" role="menuitem" data-product="customer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Customer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="pill">
+          <button class="org"><span class="mono">AC</span> Acme Corp <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button class="bell" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button>
+          <div class="avatar" id="avatar">JD</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div>
+      <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Signed in</span>
+      <h1>Welcome to WealthPay</h1>
+      <p class="sub">Your WLTH account is ready. Open the product switcher and choose <b>Pay</b> to launch WLTH Pay and complete onboarding.</p>
+      <p class="signed" id="signed"></p>
+      <button class="cta" id="launchPay">Open WLTH Pay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      <p class="hint">Broker, Shareholder, Dashboard and Customer are placeholders in this demo.</p>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var cfg = window.WLTH_SSO || {};
+      // The account created on the sign-up landing (falls back to the demo account).
+      var acct = (window.WlthSso.getAccount && window.WlthSso.getAccount()) || cfg.demoAccount || {};
+
+      // Avatar initials + signed-in line from the created account.
+      function initials(name) { return (name || 'WP').split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
+      document.getElementById('avatar').textContent = initials(acct.name);
+      document.getElementById('signed').textContent = acct.wlthId ? ('Signed in as ' + (acct.name || acct.email || acct.wlthId) + ' · ' + acct.wlthId) : '';
+
+      function toPay() { window.WlthSso.handoff({ wlthId: acct.wlthId, email: acct.email, name: acct.name }); }
+      document.getElementById('launchPay').addEventListener('click', toPay);
+
+      // Product switcher
+      var switcher = document.getElementById('switcher');
+      var trigger = document.getElementById('switchTrigger');
+      var pillIcon = document.getElementById('pillIcon');
+      var pillLabel = document.getElementById('pillLabel');
+      var items = document.querySelectorAll('.menu-item');
+      var toastEl = document.getElementById('toast'); var toastT;
+      function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 1800); }
+      function open() { switcher.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); }
+      function close() { switcher.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); }
+      trigger.addEventListener('click', function (e) { e.stopPropagation(); switcher.classList.contains('open') ? close() : open(); });
+      document.addEventListener('click', function (e) { if (!switcher.contains(e.target)) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+      items.forEach(function (el) {
+        el.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (el.getAttribute('data-product') === 'pay') { toPay(); return; }
+          // other products are placeholders — just switch the shown value
+          var icon = el.querySelector('svg'); if (icon) pillIcon.innerHTML = icon.innerHTML;
+          pillLabel.textContent = el.textContent.trim();
+          items.forEach(function (i) { i.classList.remove('current'); });
+          el.classList.add('current');
+          close();
+          toast(el.textContent.trim() + ' is a demo placeholder');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
