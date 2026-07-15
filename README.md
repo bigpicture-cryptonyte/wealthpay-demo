@@ -31,7 +31,7 @@ access to that). It exists so we can demonstrate the full sign-up → onboarding
 Shared config + SSO token minting live in one place — [`wlth-sso.js`](./wlth-sso.js):
 
 ```js
-window.JUNO_REDIRECT_URL = "https://dev.junomoney.org/invite-to-register/ru02k2fwck/business";
+window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
 window.WLTH_SSO = {
   ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth", // dev BFF SSO endpoint (API base = ssoUrl without /sso/wlth)
   demoAccount: { ... }, kycAccount: { ... },

@@ -11,7 +11,7 @@
 //  BFF's WLTH_SSO_PUBLIC_KEY). DEV ONLY — visible in page source, so
 //  this must never point at a real/prod key.
 // ============================================================
-window.JUNO_REDIRECT_URL = "https://dev.junomoney.org/invite-to-register/ru02k2fwck/business";
+window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
 window.WLTH_SSO = {
   ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth",
   demoAccount: { wlthId: "wlth-4ed90f5f-86a9-44bf-904f-41a1c31e1675", email: "test@test.com", name: "Nikhil Sahani" },
