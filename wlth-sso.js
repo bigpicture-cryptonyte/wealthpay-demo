@@ -16,7 +16,7 @@ window.WLTH_SSO = {
   ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth",
   demoAccount: { wlthId: "wlth-4ed90f5f-86a9-44bf-904f-41a1c31e1675", email: "test@test.com", name: "Nikhil Sahani" },
   // Existing user to jump straight into — opens whatever KYC state they're in.
-  kycAccount: { wlthId: "wlth-30f906ec-aaae-4fac-a646-0f03c7bb4bc2" },
+  kycAccount: { wlthId: "wlth-8b5086cf-d4c2-4fbf-aee0-42f937d57792" },
   privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmk8wXUHhNCTCt
 agVkHcrVoe8wn3YmzY4zV35XGAls8fGSVz/kiBa+SRlEjnnWqGOFP2IxA5ZgSaH0
