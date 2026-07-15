@@ -7,56 +7,8 @@
   <meta name="description" content="Create a WLTH account (or onboard via Juno Money), then apply for WLTH Pay. Demo landing for the WealthPay platform." />
   <link rel="icon" href="data:," />
 
-  <!-- ============================================================
-       DEMO CONFIG  (dev env only)
-       The landing captures an initial signup (saved to the dev BFF's
-       temp /signup-draft endpoint, which mints a wlthId), then mints a
-       WLTH SSO token for THAT wlthId and hands off to the dev BFF —
-       which verifies it, creates the session, and drops the user into
-       the Pay web UI's KYC. The Pay UI reads the same wlthId from its
-       session and prefills the KYC form from /signup-draft.
-
-       JUNO_REDIRECT_URL hands the "WLTH / Juno Money" option to Juno.
-       privateKeyPkcs8Pem is the dev RS256 key (public half is the dev
-       BFF's WLTH_SSO_PUBLIC_KEY). DEV ONLY — visible in page source.
-       ============================================================ -->
-  <script>
-    window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
-    window.WLTH_SSO = {
-      ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth",
-      demoAccount: { wlthId: "wlth-4ed90f5f-86a9-44bf-904f-41a1c31e1675", email: "test@test.com", name: "Nikhil Sahani" },
-      // Existing user to jump straight into — opens whatever KYC state they're in.
-      kycAccount: { wlthId: "wlth-30f906ec-aaae-4fac-a646-0f03c7bb4bc2" },
-      privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----
-MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmk8wXUHhNCTCt
-agVkHcrVoe8wn3YmzY4zV35XGAls8fGSVz/kiBa+SRlEjnnWqGOFP2IxA5ZgSaH0
-CfYDnYn8t8pLmR4b6KcnvXEFnAYiyZYx/Aj/6y/ys/223tsU6Pr6Ux+0NE2NnPZo
-ZVnL+47V5jJIoZHX3Oolh16lZWWR71IzyVbOituoCsKKKTLmmdO4gYSm8dNnW3uf
-Zux6uRxDNl/RumPF61ROwFoHddQbicpCHboG0GYTQ6noUypUqU6QQELSIHHj4ENt
-Z/Z1h+1jvB3zKarSTt/naCKohBNYE0V9wjEFtorjcQa52nBeJInLYP2cjKtJQ3NO
-Vy5wXYcrAgMBAAECggEAJal99/l8MaK1zEePz3qC7TlPLLWpD43jLE2IZaWsH+M2
-BKnQatmwFrbNTThPaM6qrapOh5lxivSq9tO3uUqJs8dUKDKG4bWA8ZW985A6vOvK
-FyQOXtpsfVnfr9SEQR6J/EYGAYbfz/hgp+reWiXWvhrtXImXQXCTygdoyUl7JPrT
-DkLG9a2Fzfabp5K4B3n1seSQXTuUGdMDJICjb+ndtfYJljGTEjSWF0oTy0ZBOfBq
-gWiZIID7DLTWkFObWxDELQE8PdvHEOkzvJ6mwxGK0wTw81RXsc159UTAgH6f6Sa9
-XG46gYsUmB1N49MvgEEx6xjOor6xGAXv04kQUQGIlQKBgQDBjo35bHzR0rqYFszL
-IpX8SCc4R/zwYp2R/zlYpnoe9wTQT6fKBf76FgQHcIPZYwEUmdH9zn21MauBsI4n
-ZNfm6aDgIMAAqEo1A3VFW39/g+gyfFxvgVo6W+S/ofaYLEec4/eB4MZPc6dMXlq5
-Ie9hax9cMa+AtG9uJHXjgQ9qbwKBgQDcUQ/XLVW0AroWmKwrvhJrly/IvfIgGAv6
-jFJyhLTtht7E3Rw+wZis6S5vVQ8d5t49XJHNC8FmcwHPIq4iPU+vnOxVGl4wYXp0
-NlXWT/Cs5AEVAGpfgAg775X7DsqiXhX9+udJf/FchvMLpsgTBQNn7rwcYnhpEW2u
-6Mhflow9BQKBgCbzzmSkzZXYZ87Vv88dnbuQtbvg2OlznyxThbHuhuMWaTSW4ziH
-7mFb7uGkZhRolT4VGqqOVMQTQ+Wsp18ML1r8J3EThjBbrdtvX7leiZEa9a67Ukrq
-aEMYXTenm53SQ3MyeYv8tUwmBUQcNPvO9YLQcRY3tY8cQNSUp9jqDzUnAoGAYnph
-aD89Zb8qSttnag4F0c28cDBnP+0/vXhnigTDksCMZtamv25tvixksyMEJMuDX043
-Zb3xbsfNcTcBOxDIw6iTAt9MZrfLspJu/+Kvo7guu6J56cIi7BeFpLjR3o3LqsEy
-DOqBimhPz093cvj0sspFjzJ8vAosStiGaCO0/7kCgYAhrMt9mtBtN41uzIfKurXc
-s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
-09wLeKpYuKWu/3ZFuun9rHBsAc/I/1LNOOuJbKBoZLHuT3r10fVaBtMK48QH2hPJ
-2e/0+cUsYKHePVZg7fsOKQ==
------END PRIVATE KEY-----`,
-    };
-  </script>
+  <!-- Shared WLTH SSO config + token minting (dev). Dev tools live at /dev. -->
+  <script src="wlth-sso.js"></script>
 
   <style>
     :root {
@@ -71,7 +23,6 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
       --blue-soft: #eef1ff;
       --border: #eceff0;
       --field-border: #d7dadf;
-      --pill-border: #b8c5ca;
       --danger: #d64545;
       --success: #04ca72;
       --shadow-panel: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
@@ -107,6 +58,8 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
       padding: 3px 8px; border-radius: 9999px;
     }
     .spacer { flex: 1; }
+    .dev-link { font-size: 13px; font-weight: 500; color: var(--text-dimmed); }
+    .dev-link:hover { color: var(--text); text-decoration: none; }
 
     main { display: flex; justify-content: center; padding: 32px 24px 72px; }
     .panel {
@@ -188,28 +141,6 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
     .btn-ghost { width: 100%; padding: 11px; border-radius: 12px; font-size: 15px; font-weight: 500; color: var(--text-dimmed); }
     .btn-ghost:hover { background: #f5f6f7; color: var(--text); }
 
-    /* Demo shortcuts */
-    .shortcuts { max-width: 640px; margin: 0 auto 64px; padding: 0 24px; }
-    .shortcuts-card { background: rgba(255,255,255,.6); border: 1px dashed var(--pill-border); border-radius: 16px; padding: 20px; }
-    .shortcuts-label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
-    .shortcuts-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .btn-mini {
-      display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500;
-      padding: 9px 14px; border-radius: 10px; border: 1px solid var(--pill-border); background: #fff; color: var(--text);
-    }
-    .btn-mini:hover { background: #fafafa; border-color: #a9afb9; }
-    .btn-mini svg { width: 15px; height: 15px; color: var(--text-dimmed); }
-    .dev-approve { margin-top: 16px; }
-    .dev-approve-row { display: flex; gap: 8px; }
-    .dev-approve input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--pill-border); border-radius: 9px; background: #fff; color: var(--text); }
-    .dev-approve input:focus { outline: 2px solid var(--blue-400); border-color: var(--blue-500); }
-    .dev-approve button { font: inherit; font-size: 14px; font-weight: 500; padding: 9px 16px; border-radius: 9px; background: var(--blue-500); color: #fff; }
-    .dev-approve button:hover { background: var(--blue-600); }
-    .dev-msg { display: block; margin-top: 8px; font-size: 13px; color: var(--text-dimmed); min-height: 16px; }
-    .dev-msg.ok { color: #137a52; } .dev-msg.err { color: #c0392b; }
-    .guide-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 13px; font-weight: 500; color: var(--blue-500); }
-    .guide-link svg { width: 15px; height: 15px; }
-
     .hidden { display: none !important; }
   </style>
 </head>
@@ -223,6 +154,7 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
       <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
       <span class="demo-tag">Demo</span>
       <div class="spacer"></div>
+      <a class="dev-link" href="/dev">Dev tools →</a>
     </div>
   </header>
 
@@ -289,25 +221,6 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
     </div>
   </main>
 
-  <!-- Demo shortcuts (existing dev utilities preserved) -->
-  <div class="shortcuts">
-    <div class="shortcuts-card">
-      <span class="shortcuts-label">Demo shortcuts (dev)</span>
-      <div class="shortcuts-row">
-        <button class="btn-mini" id="launchDemo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Use demo account</button>
-        <button class="btn-mini" id="launchKyc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Open KYC account</button>
-      </div>
-      <div class="dev-approve">
-        <div class="dev-approve-row">
-          <input id="approveEmail" type="email" placeholder="user@email.com — approve an account" autocomplete="off" />
-          <button id="approveBtn" type="button">Approve</button>
-        </div>
-        <span id="approveMsg" class="dev-msg"></span>
-      </div>
-      <a class="guide-link" href="guide.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Read the testing guide</a>
-    </div>
-  </div>
-
   <!-- Success modal -->
   <div class="modal-overlay hidden" id="success">
     <div class="modal">
@@ -324,9 +237,6 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
 
   <script>
     (function () {
-      var cfg = window.WLTH_SSO || {};
-      function apiBase() { return (cfg.ssoUrl || "").replace(/\/sso\/wlth\/?$/, ""); }
-
       var stepChoose = document.getElementById("step-choose");
       var stepForm = document.getElementById("step-form");
       var successModal = document.getElementById("success");
@@ -338,33 +248,10 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
 
       function show(el) { [stepChoose, stepForm].forEach(function (s) { s.classList.add("hidden"); }); el.classList.remove("hidden"); window.scrollTo(0, 0); }
 
-      // ---- WLTH SSO token minting (RS256, Web Crypto) ----
-      function b64url(bytes) { var a = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), s = ""; for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
-      function b64urlStr(str) { return b64url(new TextEncoder().encode(str)); }
-      function pemToPkcs8(pem) { var b = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, ""), r = atob(b), u = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) u[i] = r.charCodeAt(i); return u.buffer; }
-      async function mintToken(claims, pem) {
-        var key = await crypto.subtle.importKey("pkcs8", pemToPkcs8(pem), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
-        var now = Math.floor(Date.now() / 1000);
-        var header = b64urlStr(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-        var payload = b64urlStr(JSON.stringify(Object.assign({ iat: now, exp: now + 300 }, claims)));
-        var data = header + "." + payload;
-        var sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(data));
-        return data + "." + b64url(sig);
-      }
-      async function handoff(claims) {
-        if (!cfg.privateKeyPkcs8Pem) { alert("Dev SSO key not configured."); return; }
-        try {
-          var token = await mintToken(claims, cfg.privateKeyPkcs8Pem);
-          window.open(cfg.ssoUrl + "?token=" + encodeURIComponent(token), "_blank", "noopener");
-        } catch (e) { alert("Could not mint SSO token: " + e.message); }
-      }
-
-      // ---- Choose step ----
       document.getElementById("opt-wlth").addEventListener("click", function () { show(stepForm); });
       document.getElementById("opt-juno").addEventListener("click", function () { window.location.href = window.JUNO_REDIRECT_URL; });
       document.getElementById("back-to-choose").addEventListener("click", function () { show(stepChoose); });
 
-      // ---- Signup validation + save ----
       function markField(input, invalid) { var f = input.closest(".field"); if (f) f.classList.toggle("invalid", invalid); }
 
       signupForm.addEventListener("submit", async function (e) {
@@ -399,7 +286,7 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
         createBtn.textContent = "Creating…";
         var wlthId = null;
         try {
-          var res = await fetch(apiBase() + "/signup-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          var res = await fetch(window.WlthSso.apiBase() + "/signup-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
           if (res.ok) { var data = await res.json(); wlthId = data.wlthId; }
         } catch (e) { /* best-effort — fall back below so the demo still flows */ }
         // Fallback: if the temp API is unreachable, mint a local id so the hand-off
@@ -413,36 +300,10 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
         successModal.classList.remove("hidden");
       });
 
-      // ---- Success modal: Apply for WLTH Pay -> fresh account flow ----
       document.getElementById("apply-btn").addEventListener("click", function () {
-        if (!signup) return;
-        handoff({ wlthId: signup.wlthId, email: signup.email, name: signup.name });
+        if (signup) window.WlthSso.handoff({ wlthId: signup.wlthId, email: signup.email, name: signup.name });
       });
       document.getElementById("success-done").addEventListener("click", function () { successModal.classList.add("hidden"); });
-
-      // ---- Demo shortcuts ----
-      document.getElementById("launchDemo").addEventListener("click", function () { handoff(cfg.demoAccount || {}); });
-      document.getElementById("launchKyc").addEventListener("click", function () { handoff(cfg.kycAccount || {}); });
-
-      // ---- Dev tool: approve an account by email ----
-      var approveBtn = document.getElementById("approveBtn");
-      var approveEmail = document.getElementById("approveEmail");
-      var approveMsg = document.getElementById("approveMsg");
-      async function approve() {
-        var email = (approveEmail.value || "").trim();
-        approveMsg.className = "dev-msg";
-        if (!email) { approveMsg.textContent = "Enter an email."; return; }
-        approveBtn.disabled = true; approveMsg.textContent = "Approving…";
-        try {
-          var res = await fetch(apiBase() + "/admin/approve-account", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email }) });
-          var data = await res.json().catch(function () { return {}; });
-          if (res.ok) { approveMsg.textContent = "✓ Approved — " + (data.kycStatus || "VERIFIED") + " · " + (data.airwallexAccountId || ""); approveMsg.className = "dev-msg ok"; }
-          else { approveMsg.textContent = "✗ " + ((data.error && data.error.message) || ("HTTP " + res.status)); approveMsg.className = "dev-msg err"; }
-        } catch (e) { approveMsg.textContent = "✗ " + e.message; approveMsg.className = "dev-msg err"; }
-        finally { approveBtn.disabled = false; }
-      }
-      approveBtn.addEventListener("click", approve);
-      approveEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") approve(); });
     })();
   </script>
 </body>

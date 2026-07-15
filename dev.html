@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WLTH Pay — Dev tools</title>
+  <meta name="description" content="Dev shortcuts for the WealthPay demo: jump into the demo/KYC account, approve an account." />
+  <link rel="icon" href="data:," />
+
+  <script src="wlth-sso.js"></script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4; --surface: #ffffff; --text: #292e3a; --text-dimmed: #6f7682; --text-muted: #8a909c;
+      --blue-500: #1445c7; --blue-400: #3d6ae0; --blue-600: #1039a8; --blue-soft: #eef1ff;
+      --border: #eceff0; --pill-border: #b8c5ca;
+      --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+    a { color: var(--blue-500); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .demo-bar { background: var(--blue-soft); color: var(--blue-500); font-size: 13px; font-weight: 500; text-align: center; padding: 8px 16px; border-bottom: 1px solid var(--border); }
+    .demo-bar b { font-weight: 600; }
+    header { height: 84px; display: flex; align-items: center; }
+    .header-inner { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 10px; }
+    .logo { height: 19px; width: auto; color: var(--text); user-select: none; }
+    .demo-tag { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--blue-500); background: var(--blue-soft); border: 1px solid #dbe2fb; padding: 3px 8px; border-radius: 9999px; }
+    .spacer { flex: 1; }
+    .back-link { font-size: 13px; font-weight: 500; color: var(--text-dimmed); }
+    .back-link:hover { color: var(--text); text-decoration: none; }
+
+    main { display: flex; justify-content: center; padding: 32px 24px 72px; }
+    .card { width: 100%; max-width: 560px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+    .card h1 { font-size: 20px; font-weight: 600; }
+    .card p.sub { margin-top: 6px; color: var(--text-dimmed); font-size: 14px; }
+    .section-label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin: 22px 0 12px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-mini { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--pill-border); background: #fff; color: var(--text); }
+    .btn-mini:hover { background: #fafafa; border-color: #a9afb9; }
+    .btn-mini svg { width: 15px; height: 15px; color: var(--text-dimmed); }
+    .approve-row { display: flex; gap: 8px; }
+    .approve-row input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--pill-border); border-radius: 9px; background: #fff; color: var(--text); }
+    .approve-row input:focus { outline: 2px solid var(--blue-400); border-color: var(--blue-500); }
+    .approve-row button { font: inherit; font-size: 14px; font-weight: 500; padding: 10px 18px; border-radius: 9px; background: var(--blue-500); color: #fff; }
+    .approve-row button:hover { background: var(--blue-600); }
+    .approve-row button:disabled { opacity: .6; cursor: default; }
+    .dev-msg { display: block; margin-top: 8px; font-size: 13px; color: var(--text-dimmed); min-height: 16px; }
+    .dev-msg.ok { color: #137a52; } .dev-msg.err { color: #c0392b; }
+    .guide-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 20px; font-size: 14px; font-weight: 500; color: var(--blue-500); }
+    .guide-link svg { width: 15px; height: 15px; }
+  </style>
+</head>
+<body>
+  <div class="demo-bar"><b>WLTH Pay — Dev tools.</b> Shortcuts for testing on the dev environment.</div>
+
+  <header>
+    <div class="header-inner">
+      <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
+      <span class="demo-tag">Dev</span>
+      <div class="spacer"></div>
+      <a class="back-link" href="/">← Back to sign-up</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h1>Dev shortcuts</h1>
+      <p class="sub">Jump straight into a Pay account on the dev environment, or approve an account.</p>
+
+      <span class="section-label">Jump into Pay (dev)</span>
+      <div class="row">
+        <button class="btn-mini" id="launchDemo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Use demo account</button>
+        <button class="btn-mini" id="launchKyc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Open KYC account</button>
+      </div>
+
+      <span class="section-label">Approve an account</span>
+      <div class="approve-row">
+        <input id="approveEmail" type="email" placeholder="user@email.com" autocomplete="off" />
+        <button id="approveBtn" type="button">Approve</button>
+      </div>
+      <span id="approveMsg" class="dev-msg"></span>
+
+      <a class="guide-link" href="guide.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Read the testing guide</a>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var cfg = window.WLTH_SSO || {};
+      document.getElementById("launchDemo").addEventListener("click", function () { window.WlthSso.handoff(cfg.demoAccount || {}); });
+      document.getElementById("launchKyc").addEventListener("click", function () { window.WlthSso.handoff(cfg.kycAccount || {}); });
+
+      var approveBtn = document.getElementById("approveBtn");
+      var approveEmail = document.getElementById("approveEmail");
+      var approveMsg = document.getElementById("approveMsg");
+      async function approve() {
+        var email = (approveEmail.value || "").trim();
+        approveMsg.className = "dev-msg";
+        if (!email) { approveMsg.textContent = "Enter an email."; return; }
+        approveBtn.disabled = true; approveMsg.textContent = "Approving…";
+        try {
+          var res = await fetch(window.WlthSso.apiBase() + "/admin/approve-account", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email }) });
+          var data = await res.json().catch(function () { return {}; });
+          if (res.ok) { approveMsg.textContent = "✓ Approved — " + (data.kycStatus || "VERIFIED") + " · " + (data.airwallexAccountId || ""); approveMsg.className = "dev-msg ok"; }
+          else { approveMsg.textContent = "✗ " + ((data.error && data.error.message) || ("HTTP " + res.status)); approveMsg.className = "dev-msg err"; }
+        } catch (e) { approveMsg.textContent = "✗ " + e.message; approveMsg.className = "dev-msg err"; }
+        finally { approveBtn.disabled = false; }
+      }
+      approveBtn.addEventListener("click", approve);
+      approveEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") approve(); });
+    })();
+  </script>
+</body>
+</html>

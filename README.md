@@ -1,57 +1,41 @@
 # WealthPay Demo App
 
-A **static demo** of the WealthPay (WLTH) platform shell. Its only job is to mimic the
-WLTH top bar with the **Pay** service dropdown and hand the user off to our separately-built
-**Pay frontend** when they click **Pay**.
+A **static demo** of the WLTH Pay customer sign-up. It captures an initial WLTH signup, hands
+the user off to our separately-built **Pay frontend** (dev) via a WLTH SSO token, and lets the
+Pay UI prefill KYC from the signup.
 
 This is throwaway/demo scaffolding — it is **not** the real WealthPay platform (we don't have
-access to that). It exists so we can demonstrate the full hand-off flow end-to-end.
+access to that). It exists so we can demonstrate the full sign-up → onboarding flow end-to-end.
 
-## What it does
+## Pages
 
-- A minimal WLTH platform shell: logo + **Demo** tag, the **Pay** service switcher
-  (Broker / Pay / Shareholder / Dashboard / Customer), account chip + avatar.
-- A simple welcome hero with a **Launch Pay** button.
-- Clicking **Pay** in the dropdown (or **Launch Pay**) redirects to the Pay frontend.
-- The other four services are demo-only (they show a small "demo only" toast).
+- **`/` ([`index.html`](./index.html)) — the sign-up landing.** Choose **WLTH** or
+  **WLTH / Juno Money**:
+  - **WLTH account** — a prefilled WLTH registration form. **Create account** POSTs to the dev
+    BFF's temp `/signup-draft` endpoint (which saves the signup in its **own collection** and
+    mints a `wlthId`), then shows a success modal. **Apply for WLTH Pay** mints a WLTH SSO token
+    for that `wlthId` and hands off to the dev Pay UI, which prefills the KYC form from the saved
+    signup.
+  - **WLTH / Juno Money account** — hands the customer off to Juno Money.
+- **`/dev` ([`dev.html`](./dev.html)) — dev tools.** Jump straight into the demo/KYC account on
+  dev, or approve an account. Linked from the landing header.
+- **`/signup` ([`signup.html`](./signup.html)) — older standalone sign-up demo** (self-contained
+  business-onboarding walkthrough), kept for reference.
 
-> Note: there are no Pay pages here on purpose. Payments / payees / cards etc. live in the
-> separate **Pay frontend** repo — this shell only launches it.
+## Configure the endpoints
 
-## Sign-up page (`/signup`)
+Shared config + SSO token minting live in one place — [`wlth-sso.js`](./wlth-sso.js):
 
-[`signup.html`](./signup.html) is a standalone demo of the WLTH Pay customer sign-up, served at
-`/signup` (Vercel `cleanUrls`). It offers the two onboarding journeys from the WLTH onboarding doc:
-
-- **WLTH account** — a click-through demo of the full WLTH-direct journey, prefilled at each step:
-  1. **Stage 1 – account registration** (name, DOB, contact, residential address, password, T&Cs /
-     Privacy consent). Hitting **Create account** shows an account-created / signed-in screen with a
-     **Start business onboarding** button.
-  2. **Stage 2 – WLTH Pay business onboarding** — a 7-step wizard inside one form (business
-     details, activities, directors, beneficial owners, authorised representative, supporting
-     documents, declaration).
-  3. **Submit application** opens a completion modal summarising the details submitted for
-     WLTH Pay verification and the verification → WLTH Pay activation status.
-- **WLTH / Juno Money account** — hands the customer off to Juno Money, which on-boards them and
-  shares their details back with WLTH.
-
-## Configure the redirect targets
-
-The hand-off URLs each live in one place at the top of their file:
-
-```html
-<!-- index.html -->
-<script>
-  window.PAY_REDIRECT_URL = "https://wealth-pay-web-ui.vercel.app/"; // deployed Pay frontend
-</script>
-
-<!-- signup.html -->
-<script>
-  window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business"; // Juno Money onboarding
-</script>
+```js
+window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
+window.WLTH_SSO = {
+  ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth", // dev BFF SSO endpoint (API base = ssoUrl without /sso/wlth)
+  demoAccount: { ... }, kycAccount: { ... },
+  privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----…`,          // DEV-ONLY RS256 key (public half = dev BFF WLTH_SSO_PUBLIC_KEY)
+};
 ```
 
-Update them here if either URL ever changes.
+Both `index.html` and `dev.html` load `wlth-sso.js`, so the key/URLs are defined once.
 
 ## Run locally
 
