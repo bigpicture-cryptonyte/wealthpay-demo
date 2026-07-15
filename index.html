@@ -3,30 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WLTH Pay — Demo</title>
-  <meta name="description" content="Demo of the WealthPay platform shell. Choosing 'Pay' hands off to the Pay service frontend." />
+  <title>WLTH Pay — Sign up</title>
+  <meta name="description" content="Create a WLTH account (or onboard via Juno Money), then apply for WLTH Pay. Demo landing for the WealthPay platform." />
   <link rel="icon" href="data:," />
 
   <!-- ============================================================
        DEMO CONFIG  (dev env only)
-       The shell mints a WLTH SSO token and hands off to the dev BFF,
-       which verifies it, find-or-creates the user, sets the session
-       cookie, and redirects into the Pay web UI.
-         - "demo account"  => fixed wlthId (same seeded user every time)
-         - "fresh account" => unique wlthId (triggers KYC onboarding)
-       ssoUrl is the dev BFF SSO endpoint (BFF is served at /api/*).
-       privateKeyPkcs8Pem is the RS256 key whose public half is the
-       dev BFF's WLTH_SSO_PUBLIC_KEY. DEV ONLY — it is visible in page
-       source, so this must never point at a real/prod key.
+       The landing captures an initial signup (saved to the dev BFF's
+       temp /signup-draft endpoint, which mints a wlthId), then mints a
+       WLTH SSO token for THAT wlthId and hands off to the dev BFF —
+       which verifies it, creates the session, and drops the user into
+       the Pay web UI's KYC. The Pay UI reads the same wlthId from its
+       session and prefills the KYC form from /signup-draft.
+
+       JUNO_REDIRECT_URL hands the "WLTH / Juno Money" option to Juno.
+       privateKeyPkcs8Pem is the dev RS256 key (public half is the dev
+       BFF's WLTH_SSO_PUBLIC_KEY). DEV ONLY — visible in page source.
        ============================================================ -->
   <script>
+    window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
     window.WLTH_SSO = {
       ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth",
       demoAccount: { wlthId: "wlth-4ed90f5f-86a9-44bf-904f-41a1c31e1675", email: "test@test.com", name: "Nikhil Sahani" },
       // Existing user to jump straight into — opens whatever KYC state they're in.
       kycAccount: { wlthId: "wlth-30f906ec-aaae-4fac-a646-0f03c7bb4bc2" },
-      // Dev RS256 private key (PKCS#8 PEM); public half is the dev BFF's
-      // WLTH_SSO_PUBLIC_KEY. ponytail: dev-only, key intentionally inline.
       privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmk8wXUHhNCTCt
 agVkHcrVoe8wn3YmzY4zV35XGAls8fGSVz/kiBa+SRlEjnnWqGOFP2IxA5ZgSaH0
@@ -70,473 +70,280 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
       --blue-600: #1039a8;
       --blue-soft: #eef1ff;
       --border: #eceff0;
+      --field-border: #d7dadf;
       --pill-border: #b8c5ca;
-      --chip-border: #b8c5ca;
-      --chip-hover: #ececec;
-      --slate: #4c5a68;
+      --danger: #d64545;
+      --success: #04ca72;
+      --shadow-panel: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
       --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
       --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
+      background: var(--bg); color: var(--text); font-family: var(--font);
+      min-height: 100vh; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
     }
-
-    a { text-decoration: none; color: inherit; }
+    a { color: var(--blue-500); text-decoration: none; }
+    a:hover { text-decoration: underline; }
     button { font-family: inherit; cursor: pointer; border: none; background: none; }
 
-    /* ---------------- Demo notice ---------------- */
     .demo-bar {
-      background: var(--blue-soft);
-      color: var(--blue-500);
-      font-size: 13px;
-      font-weight: 500;
-      text-align: center;
-      padding: 8px 16px;
-      border-bottom: 1px solid var(--border);
+      background: var(--blue-soft); color: var(--blue-500);
+      font-size: 13px; font-weight: 500; text-align: center;
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
     }
     .demo-bar b { font-weight: 600; }
 
-    /* ---------------- Header ---------------- */
-    header {
-      height: 100px;
-      display: flex;
-      align-items: center;
-    }
+    header { height: 84px; display: flex; align-items: center; }
     .header-inner {
-      width: 100%;
-      max-width: 1240px;
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 10px;
     }
-
-    .brand { display: flex; align-items: center; gap: 10px; margin-right: 6px; }
-    .logo { height: 20px; width: auto; color: var(--text); user-select: none; }
+    .logo { height: 19px; width: auto; color: var(--text); user-select: none; }
     .demo-tag {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--blue-500);
-      background: var(--blue-soft);
-      border: 1px solid #dbe2fb;
-      padding: 3px 8px;
-      border-radius: 9999px;
+      font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--blue-500); background: var(--blue-soft); border: 1px solid #dbe2fb;
+      padding: 3px 8px; border-radius: 9999px;
     }
-
-    /* Service dropdown trigger */
-    .pay-dropdown { position: relative; }
-    .pay-trigger {
-      display: flex;
-      align-items: center;
-      background: var(--surface);
-      border-radius: 9999px;
-      padding: 8px 12px;
-      transition: background .15s ease;
-    }
-    .pay-trigger:hover { background: #fafafa; }
-    .pay-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--pill-border);
-      border-radius: 24px;
-      background: transparent;
-      color: var(--text);
-      padding: 8px 14px;
-      font-size: 15px;
-      font-weight: 500;
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .pay-trigger:hover .pay-pill { border-color: #a9afb9; }
-    /* Highlight the trigger while the menu is open */
-    .pay-dropdown.open .pay-pill { border-color: var(--blue-500); }
-
-    .pay-pill .pill-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--text-dimmed); }
-    .pay-pill .pill-label { white-space: nowrap; }
-    .pay-pill .chevron {
-      width: 18px; height: 18px;
-      flex-shrink: 0;
-      color: var(--text-dimmed);
-      transition: transform .2s ease;
-    }
-    .pay-dropdown.open .pay-pill .chevron { transform: rotate(180deg); color: var(--blue-500); }
-
-    /* Dropdown menu */
-    .pay-menu {
-      position: absolute;
-      top: calc(100% + 10px);
-      left: 8px;
-      min-width: 224px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow-menu);
-      padding: 16px;
-      display: none;
-      flex-direction: column;
-      gap: 2px;
-      z-index: 50;
-    }
-    .pay-dropdown.open .pay-menu { display: flex; animation: pop .14s ease; }
-    @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 16px;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      text-align: left;
-      transition: background .12s ease;
-    }
-    .menu-item:hover { background: #f5f6f7; }
-    .menu-item svg { width: 20px; height: 20px; color: var(--text-dimmed); flex-shrink: 0; }
-    .menu-item.current { background: var(--blue-soft); color: var(--blue-500); }
-    .menu-item.current svg { color: var(--blue-400); }
-    .menu-item.current:hover { background: #e6ebff; }
-
     .spacer { flex: 1; }
 
-    /* Right cluster */
-    .right-cluster { display: flex; align-items: center; gap: 12px; }
-    .acct-chip {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border: 1px solid var(--chip-border);
-      border-radius: 24px;
-      padding: 7px 12px 7px 8px;
-      font-size: 14px;
-      font-weight: 500;
-      background: transparent;
-      transition: background .12s ease;
+    main { display: flex; justify-content: center; padding: 32px 24px 72px; }
+    .panel {
+      width: 100%; max-width: 640px; background: var(--surface);
+      border-radius: 24px; box-shadow: var(--shadow-panel); padding: 40px;
     }
-    .acct-chip:hover { background: var(--chip-hover); }
-    .acct-badge {
-      width: 26px; height: 26px;
-      border-radius: 9999px;
-      background: #e9eaec;
-      color: var(--text-dimmed);
-      font-size: 11px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .acct-chip .chev { color: var(--text-dimmed); width: 16px; height: 16px; }
-    .avatar {
-      width: 36px; height: 36px;
-      border-radius: 9999px;
-      background: var(--text);
-      color: #fff;
-      font-size: 12px; font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bell {
-      position: relative;
-      width: 36px; height: 36px;
-      border-radius: 9999px;
-      background: var(--slate);
-      color: #fff;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .bell svg { width: 18px; height: 18px; }
-    .bell::after {
-      content: "";
-      position: absolute;
-      top: 7px; right: 8px;
-      width: 8px; height: 8px;
-      border-radius: 9999px;
-      background: #22c55e;
-      border: 2px solid var(--slate);
-    }
+    @media (max-width: 560px) { .panel { padding: 24px; } }
+    .panel-head { margin-bottom: 24px; }
+    .panel-head.center { text-align: center; }
+    .panel-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+    .panel-head p { margin-top: 6px; color: var(--text-dimmed); font-size: 15px; line-height: 1.5; }
 
-    /* ---------------- Hero ---------------- */
-    main {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 80px 24px 96px;
+    /* Option cards */
+    .options { display: flex; flex-direction: column; gap: 16px; }
+    .option {
+      display: block; width: 100%; text-align: left; background: #f7f8f9;
+      border: 1px solid transparent; border-radius: 20px; padding: 20px;
+      transition: background .12s ease, border-color .12s ease;
     }
-    .hero-eyebrow {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: .04em;
-      color: var(--blue-500);
-      margin-bottom: 14px;
+    .option:hover { background: var(--blue-soft); border-color: #dbe2fb; }
+    .option .opt-icon {
+      width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 9999px; background: var(--blue-soft); color: var(--blue-500);
     }
-    .hero h1 {
-      font-size: 40px;
-      font-weight: 600;
-      letter-spacing: -.02em;
-      line-height: 1.1;
+    .option .opt-icon svg { width: 20px; height: 20px; }
+    .option .opt-title { margin-top: 14px; font-size: 16px; font-weight: 600; }
+    .option .opt-sub { margin-top: 4px; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
+    .option .opt-cta { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; color: var(--blue-500); font-size: 14px; font-weight: 600; }
+    .option .opt-cta svg { width: 16px; height: 16px; }
+
+    /* Form */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dimmed); font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+    .back-btn:hover { color: var(--text); }
+    .back-btn svg { width: 16px; height: 16px; }
+    form { display: flex; flex-direction: column; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+    .field > .label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+    .field .label .opt { font-weight: 400; color: var(--text-dimmed); }
+    .field .label .req { color: var(--danger); }
+    .field input, .field select {
+      width: 100%; font-family: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+      border: 1px solid var(--field-border); border-radius: 12px; padding: 10px 14px; transition: border-color .12s ease;
     }
-    .hero p {
-      max-width: 540px;
-      margin: 16px auto 0;
-      color: var(--text-dimmed);
-      font-size: 16px;
-      line-height: 1.6;
-    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--blue-500); }
+    .field .err { margin-top: 5px; font-size: 12px; color: var(--danger); display: none; }
+    .field.invalid .err { display: block; }
+    .field.invalid input { border-color: var(--danger); }
+    .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-dimmed); }
+    .check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--blue-500); flex-shrink: 0; }
+
     .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--blue-500);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 500;
-      padding: 14px 24px;
-      border-radius: 12px;
-      margin-top: 32px;
-      transition: background .15s ease, transform .1s ease;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+      background: var(--blue-500); color: #fff; font-size: 16px; font-weight: 500;
+      padding: 13px 24px; border-radius: 12px; margin-top: 6px; transition: background .15s ease, transform .1s ease;
     }
     .btn-primary:hover { background: var(--blue-600); }
     .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { opacity: .6; cursor: default; }
     .btn-primary svg { width: 18px; height: 18px; }
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      color: var(--text);
-      font-size: 16px;
-      font-weight: 500;
-      padding: 14px 24px;
-      border: 1px solid var(--pill-border);
-      border-radius: 12px;
-      transition: background .15s ease, border-color .15s ease, transform .1s ease;
-    }
-    .btn-secondary:hover { background: #fafafa; border-color: #a9afb9; }
-    .btn-secondary:active { transform: translateY(1px); }
-    .btn-secondary svg { width: 18px; height: 18px; color: var(--text-dimmed); }
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 32px;
-    }
-    .hero-actions .btn-primary { margin-top: 0; }
-    .hero-hint {
-      margin-top: 18px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .guide-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--blue-500);
-      border-bottom: 1px solid transparent;
-      transition: border-color .15s ease;
-    }
-    .guide-link:hover { border-bottom-color: var(--blue-500); }
-    .guide-link svg { width: 16px; height: 16px; }
 
-    .dev-tool {
-      margin: 32px auto 0;
-      max-width: 420px;
-      border: 1px dashed var(--pill-border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      text-align: left;
-      background: rgba(255,255,255,.5);
+    /* Success modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100; background: rgba(20,24,33,.55);
+      display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto;
     }
-    .dev-tool-label {
-      display: block;
-      font-size: 11px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 10px;
+    .modal { width: 100%; max-width: 460px; background: var(--surface); border-radius: 24px; box-shadow: var(--shadow-menu); padding: 32px; text-align: center; animation: pop .16s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    .modal .m-icon {
+      width: 60px; height: 60px; margin: 0 auto; border-radius: 9999px;
+      background: rgba(4,202,114,.12); color: var(--success); display: inline-flex; align-items: center; justify-content: center;
     }
-    .dev-tool-row { display: flex; gap: 8px; }
-    .dev-tool input {
-      flex: 1;
-      min-width: 0;
-      font: inherit;
-      font-size: 14px;
-      padding: 10px 12px;
-      border: 1px solid var(--pill-border);
-      border-radius: 9px;
-      background: #fff;
-      color: var(--text);
-    }
-    .dev-tool input:focus { outline: 2px solid var(--blue-400); outline-offset: 0; border-color: var(--blue-500); }
-    .dev-tool button {
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 10px 16px;
-      border-radius: 9px;
-      background: var(--blue-500);
-      color: #fff;
-    }
-    .dev-tool button:hover { background: var(--blue-600); }
-    .dev-tool button:disabled { opacity: .6; cursor: default; }
-    .dev-tool-msg { display: block; margin-top: 10px; font-size: 13px; color: var(--text-dimmed); min-height: 18px; }
-    .dev-tool-msg.ok { color: #137a52; }
-    .dev-tool-msg.err { color: #c0392b; }
+    .modal .m-icon svg { width: 30px; height: 30px; }
+    .modal h2 { margin-top: 18px; font-size: 22px; font-weight: 600; }
+    .modal .m-sub { margin: 8px auto 0; max-width: 380px; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
+    .modal .m-id { margin-top: 14px; font-size: 12px; color: var(--text-muted); word-break: break-all; }
+    .modal .m-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .btn-ghost { width: 100%; padding: 11px; border-radius: 12px; font-size: 15px; font-weight: 500; color: var(--text-dimmed); }
+    .btn-ghost:hover { background: #f5f6f7; color: var(--text); }
 
-    @media (max-width: 720px) {
-      .acct-chip { display: none; }
-      .hero h1 { font-size: 30px; }
+    /* Demo shortcuts */
+    .shortcuts { max-width: 640px; margin: 0 auto 64px; padding: 0 24px; }
+    .shortcuts-card { background: rgba(255,255,255,.6); border: 1px dashed var(--pill-border); border-radius: 16px; padding: 20px; }
+    .shortcuts-label { display: block; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+    .shortcuts-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-mini {
+      display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500;
+      padding: 9px 14px; border-radius: 10px; border: 1px solid var(--pill-border); background: #fff; color: var(--text);
     }
+    .btn-mini:hover { background: #fafafa; border-color: #a9afb9; }
+    .btn-mini svg { width: 15px; height: 15px; color: var(--text-dimmed); }
+    .dev-approve { margin-top: 16px; }
+    .dev-approve-row { display: flex; gap: 8px; }
+    .dev-approve input { flex: 1; min-width: 0; font: inherit; font-size: 14px; padding: 9px 12px; border: 1px solid var(--pill-border); border-radius: 9px; background: #fff; color: var(--text); }
+    .dev-approve input:focus { outline: 2px solid var(--blue-400); border-color: var(--blue-500); }
+    .dev-approve button { font: inherit; font-size: 14px; font-weight: 500; padding: 9px 16px; border-radius: 9px; background: var(--blue-500); color: #fff; }
+    .dev-approve button:hover { background: var(--blue-600); }
+    .dev-msg { display: block; margin-top: 8px; font-size: 13px; color: var(--text-dimmed); min-height: 16px; }
+    .dev-msg.ok { color: #137a52; } .dev-msg.err { color: #c0392b; }
+    .guide-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; font-size: 13px; font-weight: 500; color: var(--blue-500); }
+    .guide-link svg { width: 15px; height: 15px; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="demo-bar">
-    <b>WLTH Pay — Demo shell.</b> Open the services menu and choose <b>Pay</b> (or use the button below) to hand off to the Pay frontend.
+    <b>WLTH Pay — Demo sign-up.</b> Create a WLTH account (prefilled), then <b>Apply for WLTH Pay</b> to jump into onboarding on the dev Pay UI.
   </div>
 
   <header>
     <div class="header-inner">
-      <div class="brand">
-        <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
-        <span class="demo-tag">Demo</span>
-      </div>
-
-      <!-- Service switcher (defaults to Broker; choosing Pay redirects) -->
-      <div class="pay-dropdown" id="payDropdown">
-        <button class="pay-trigger" id="payTrigger" aria-haspopup="menu" aria-expanded="false">
-          <span class="pay-pill">
-            <svg class="pill-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
-            <span class="pill-label">Broker</span>
-            <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-          </span>
-        </button>
-
-        <div class="pay-menu" role="menu" aria-label="Services">
-          <button class="menu-item current" role="menuitem" data-service="broker">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
-            Broker
-          </button>
-          <button class="menu-item" role="menuitem" data-service="pay">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-            Pay
-          </button>
-          <button class="menu-item" role="menuitem" data-service="shareholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-            Shareholder
-          </button>
-          <button class="menu-item" role="menuitem" data-service="dashboard">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-            Dashboard
-          </button>
-          <button class="menu-item" role="menuitem" data-service="customer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            Customer
-          </button>
-        </div>
-      </div>
-
+      <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
+      <span class="demo-tag">Demo</span>
       <div class="spacer"></div>
-
-      <div class="right-cluster">
-        <button class="acct-chip">
-          <span class="acct-badge">AC</span>
-          Acme Corp
-          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <button class="bell" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
-        </button>
-        <div class="avatar">AJ</div>
-      </div>
     </div>
   </header>
 
   <main>
-    <div class="hero">
-      <div class="hero-eyebrow">WealthPay Platform</div>
-      <h1>Welcome to WealthPay</h1>
-      <p>This is a demo of the WealthPay platform shell. The Pay service is handled by our team — jump into the demo account, or create a fresh one to walk through onboarding.</p>
-      <div class="hero-actions">
-        <button class="btn-primary" id="launchDemo">
-          Use demo account
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </button>
-        <button class="btn-secondary" id="launchFresh">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-          Create fresh account
-        </button>
-        <button class="btn-secondary" id="launchKyc">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          Open KYC account
-        </button>
-      </div>
-      <div class="hero-hint">Both open Pay on the dev environment. Fresh accounts start at KYC onboarding. Broker, Shareholder, Dashboard and Customer are placeholders.</div>
-      <a class="guide-link" href="guide.html" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Read the testing guide — features &amp; sample data
-      </a>
-      <div class="dev-tool">
-        <span class="dev-tool-label">Dev tool · approve an account</span>
-        <div class="dev-tool-row">
-          <input id="approveEmail" type="email" placeholder="user@email.com" autocomplete="off" />
-          <button id="approveBtn" type="button">Approve</button>
+    <div class="panel">
+      <!-- Step 1: choose account type -->
+      <section id="step-choose">
+        <div class="panel-head center">
+          <h1>Create your account</h1>
+          <p>Choose how you’d like to get started with WLTH Pay.</p>
         </div>
-        <span id="approveMsg" class="dev-tool-msg"></span>
-      </div>
+        <div class="options">
+          <button class="option" id="opt-wlth">
+            <span class="opt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
+            <div class="opt-title">WLTH account</div>
+            <div class="opt-sub">Sign up directly with WLTH, then apply for WLTH Pay and complete business onboarding.</div>
+            <span class="opt-cta">Sign up with WLTH <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </button>
+          <button class="option" id="opt-juno">
+            <span class="opt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg></span>
+            <div class="opt-title">WLTH / Juno Money account</div>
+            <div class="opt-sub">Onboard through Juno Money — your details are shared with WLTH to create your account.</div>
+            <span class="opt-cta">Continue with Juno Money <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: WLTH registration (prefilled) -->
+      <section id="step-form" class="hidden">
+        <button class="back-btn" id="back-to-choose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Back</button>
+        <div class="panel-head">
+          <h1>Create your WLTH account</h1>
+          <p>Every customer first creates a WLTH account. Details are prefilled for this demo — hit Create account to continue.</p>
+        </div>
+        <form id="signup-form" novalidate>
+          <div class="grid-2">
+            <label class="field"><span class="label">First name <span class="req">*</span></span><input name="firstName" required value="Jane" /><span class="err">Required</span></label>
+            <label class="field"><span class="label">Middle name <span class="opt">(optional)</span></span><input name="middleName" value="" placeholder="Alex" /></label>
+            <label class="field"><span class="label">Last name <span class="req">*</span></span><input name="lastName" required value="Doe" /><span class="err">Required</span></label>
+            <label class="field"><span class="label">Date of birth <span class="req">*</span></span><input name="dob" type="date" required value="1990-05-14" /><span class="err">Required</span></label>
+            <label class="field"><span class="label">Email address <span class="req">*</span></span><input name="email" type="email" required value="jane.doe@acmepay.com.au" /><span class="err">Enter a valid email</span></label>
+            <label class="field"><span class="label">Mobile number <span class="req">*</span></span><input name="mobile" type="tel" required value="+61 400 123 456" /><span class="err">Required</span></label>
+          </div>
+          <label class="field"><span class="label">Residential address <span class="req">*</span></span><input name="address" required value="123 George Street" /><span class="err">Required</span></label>
+          <div class="grid-2">
+            <label class="field"><span class="label">Suburb <span class="req">*</span></span><input name="suburb" required value="Sydney" /><span class="err">Required</span></label>
+            <label class="field"><span class="label">State <span class="req">*</span></span>
+              <select name="state" required><option value="">Select state</option><option>ACT</option><option selected>NSW</option><option>NT</option><option>QLD</option><option>SA</option><option>TAS</option><option>VIC</option><option>WA</option></select>
+              <span class="err">Required</span></label>
+            <label class="field"><span class="label">Postcode <span class="req">*</span></span><input name="postcode" required inputmode="numeric" pattern="\d{4}" value="2000" /><span class="err">4-digit postcode</span></label>
+            <label class="field"><span class="label">Country <span class="req">*</span></span>
+              <select name="country" required><option value="Australia" selected>Australia</option><option value="New Zealand">New Zealand</option></select>
+              <span class="err">Required</span></label>
+          </div>
+          <div class="grid-2">
+            <label class="field"><span class="label">Password <span class="req">*</span></span><input name="password" type="password" required minlength="8" value="Passw0rd!" /><span class="err">At least 8 characters</span></label>
+            <label class="field"><span class="label">Confirm password <span class="req">*</span></span><input name="confirmPassword" type="password" required minlength="8" value="Passw0rd!" /><span class="err">Passwords do not match</span></label>
+          </div>
+          <label class="check"><input type="checkbox" name="terms" required checked /> <span>I accept the <a href="#" onclick="return false">Terms &amp; Conditions</a></span></label>
+          <label class="check"><input type="checkbox" name="privacy" required checked /> <span>I accept the <a href="#" onclick="return false">Privacy Policy</a></span></label>
+          <button type="submit" class="btn-primary" id="create-btn">Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        </form>
+      </section>
     </div>
   </main>
 
+  <!-- Demo shortcuts (existing dev utilities preserved) -->
+  <div class="shortcuts">
+    <div class="shortcuts-card">
+      <span class="shortcuts-label">Demo shortcuts (dev)</span>
+      <div class="shortcuts-row">
+        <button class="btn-mini" id="launchDemo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Use demo account</button>
+        <button class="btn-mini" id="launchKyc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Open KYC account</button>
+      </div>
+      <div class="dev-approve">
+        <div class="dev-approve-row">
+          <input id="approveEmail" type="email" placeholder="user@email.com — approve an account" autocomplete="off" />
+          <button id="approveBtn" type="button">Approve</button>
+        </div>
+        <span id="approveMsg" class="dev-msg"></span>
+      </div>
+      <a class="guide-link" href="guide.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> Read the testing guide</a>
+    </div>
+  </div>
+
+  <!-- Success modal -->
+  <div class="modal-overlay hidden" id="success">
+    <div class="modal">
+      <span class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <h2>WLTH account created</h2>
+      <p class="m-sub">Your account is ready. Apply for WLTH Pay to complete onboarding — we’ll prefill your details.</p>
+      <p class="m-id" id="success-id"></p>
+      <div class="m-actions">
+        <button class="btn-primary" id="apply-btn">Apply for WLTH Pay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="btn-ghost" id="success-done">Not now</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
-      var dropdown = document.getElementById("payDropdown");
-      var trigger = document.getElementById("payTrigger");
-      var launchDemo = document.getElementById("launchDemo");
-      var launchFresh = document.getElementById("launchFresh");
-      var launchKyc = document.getElementById("launchKyc");
-      var items = document.querySelectorAll(".menu-item");
-      var pillIcon = document.querySelector(".pill-icon");
-      var pillLabel = document.querySelector(".pill-label");
+      var cfg = window.WLTH_SSO || {};
+      function apiBase() { return (cfg.ssoUrl || "").replace(/\/sso\/wlth\/?$/, ""); }
 
-      // ---- WLTH SSO token minting (RS256, client-side via Web Crypto) ----
-      function b64url(bytes) {
-        var arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
-        var bin = "";
-        for (var i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
-        return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-      }
+      var stepChoose = document.getElementById("step-choose");
+      var stepForm = document.getElementById("step-form");
+      var successModal = document.getElementById("success");
+      var signupForm = document.getElementById("signup-form");
+      var createBtn = document.getElementById("create-btn");
+
+      // Captured after a successful signup — reused when "Apply for WLTH Pay" mints the token.
+      var signup = null;
+
+      function show(el) { [stepChoose, stepForm].forEach(function (s) { s.classList.add("hidden"); }); el.classList.remove("hidden"); window.scrollTo(0, 0); }
+
+      // ---- WLTH SSO token minting (RS256, Web Crypto) ----
+      function b64url(bytes) { var a = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes), s = ""; for (var i = 0; i < a.length; i++) s += String.fromCharCode(a[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
       function b64urlStr(str) { return b64url(new TextEncoder().encode(str)); }
-      function pemToPkcs8(pem) {
-        var body = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
-        var raw = atob(body);
-        var buf = new Uint8Array(raw.length);
-        for (var i = 0; i < raw.length; i++) buf[i] = raw.charCodeAt(i);
-        return buf.buffer;
-      }
+      function pemToPkcs8(pem) { var b = pem.replace(/-----[^-]+-----/g, "").replace(/\s+/g, ""), r = atob(b), u = new Uint8Array(r.length); for (var i = 0; i < r.length; i++) u[i] = r.charCodeAt(i); return u.buffer; }
       async function mintToken(claims, pem) {
-        var key = await crypto.subtle.importKey(
-          "pkcs8", pemToPkcs8(pem),
-          { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]
-        );
+        var key = await crypto.subtle.importKey("pkcs8", pemToPkcs8(pem), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
         var now = Math.floor(Date.now() / 1000);
         var header = b64urlStr(JSON.stringify({ alg: "RS256", typ: "JWT" }));
         var payload = b64urlStr(JSON.stringify(Object.assign({ iat: now, exp: now + 300 }, claims)));
@@ -544,113 +351,98 @@ s4xccXzgR+WRyDZUe+QnZ6QBeIJ62JEFpVDZA2TEeQzq1C0MT9o0YxayZPQdJFuH
         var sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(data));
         return data + "." + b64url(sig);
       }
-      async function handoff(mode) {
-        var cfg = window.WLTH_SSO || {};
-        if (!cfg.privateKeyPkcs8Pem) {
-          alert("Dev SSO key not configured: set window.WLTH_SSO.privateKeyPkcs8Pem in index.html.");
-          return;
-        }
-        var claims = mode === "demo" ? cfg.demoAccount
-          : mode === "kyc" ? cfg.kycAccount
-          : { wlthId: "wlth-" + crypto.randomUUID(), email: "fresh-" + Date.now() + "@wlth.test", name: "New User" };
+      async function handoff(claims) {
+        if (!cfg.privateKeyPkcs8Pem) { alert("Dev SSO key not configured."); return; }
         try {
           var token = await mintToken(claims, cfg.privateKeyPkcs8Pem);
           window.open(cfg.ssoUrl + "?token=" + encodeURIComponent(token), "_blank", "noopener");
-        } catch (e) {
-          alert("Could not mint SSO token: " + e.message);
-        }
+        } catch (e) { alert("Could not mint SSO token: " + e.message); }
       }
 
-      function open() {
-        dropdown.classList.add("open");
-        trigger.setAttribute("aria-expanded", "true");
-      }
-      function close() {
-        dropdown.classList.remove("open");
-        trigger.setAttribute("aria-expanded", "false");
-      }
-      function toggle() {
-        dropdown.classList.contains("open") ? close() : open();
-      }
+      // ---- Choose step ----
+      document.getElementById("opt-wlth").addEventListener("click", function () { show(stepForm); });
+      document.getElementById("opt-juno").addEventListener("click", function () { window.location.href = window.JUNO_REDIRECT_URL; });
+      document.getElementById("back-to-choose").addEventListener("click", function () { show(stepChoose); });
 
-      // Switch the displayed service (placeholders only — Pay is handled separately)
-      function selectService(el) {
-        var icon = el.querySelector("svg");
-        if (icon) pillIcon.innerHTML = icon.innerHTML;
-        pillLabel.textContent = el.textContent.trim();
-        items.forEach(function (i) { i.classList.remove("current"); });
-        el.classList.add("current");
-      }
+      // ---- Signup validation + save ----
+      function markField(input, invalid) { var f = input.closest(".field"); if (f) f.classList.toggle("invalid", invalid); }
 
-      trigger.addEventListener("click", function (e) {
-        e.stopPropagation();
-        toggle();
+      signupForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        var valid = true;
+        signupForm.querySelectorAll("input, select").forEach(function (el) {
+          if (el.type === "checkbox") return;
+          var ok = el.checkValidity(); markField(el, !ok); if (!ok) valid = false;
+        });
+        if (signupForm.password.value && signupForm.confirmPassword.value && signupForm.password.value !== signupForm.confirmPassword.value) { markField(signupForm.confirmPassword, true); valid = false; }
+        if (!signupForm.terms.checked || !signupForm.privacy.checked) valid = false;
+        if (!valid) return;
+
+        var f = signupForm;
+        var body = {
+          firstName: f.firstName.value.trim(),
+          middleName: f.middleName.value.trim(),
+          lastName: f.lastName.value.trim(),
+          dateOfBirth: f.dob.value,
+          email: f.email.value.trim(),
+          mobile: f.mobile.value.trim(),
+          residentialAddress: {
+            addressLine1: f.address.value.trim(),
+            suburb: f.suburb.value.trim(),
+            state: f.state.value,
+            postcode: f.postcode.value.trim(),
+            country: f.country.value,
+          },
+        };
+
+        createBtn.disabled = true;
+        createBtn.textContent = "Creating…";
+        var wlthId = null;
+        try {
+          var res = await fetch(apiBase() + "/signup-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          if (res.ok) { var data = await res.json(); wlthId = data.wlthId; }
+        } catch (e) { /* best-effort — fall back below so the demo still flows */ }
+        // Fallback: if the temp API is unreachable, mint a local id so the hand-off
+        // still works (the Pay UI just won't find a draft to prefill).
+        if (!wlthId) wlthId = "wlth-" + crypto.randomUUID();
+
+        signup = { wlthId: wlthId, email: body.email, name: [body.firstName, body.lastName].filter(Boolean).join(" ") || "New User" };
+        document.getElementById("success-id").textContent = "WLTH ID · " + wlthId;
+        createBtn.disabled = false;
+        createBtn.innerHTML = 'Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+        successModal.classList.remove("hidden");
       });
 
-      // Close on outside click / Escape
-      document.addEventListener("click", function (e) {
-        if (!dropdown.contains(e.target)) close();
+      // ---- Success modal: Apply for WLTH Pay -> fresh account flow ----
+      document.getElementById("apply-btn").addEventListener("click", function () {
+        if (!signup) return;
+        handoff({ wlthId: signup.wlthId, email: signup.email, name: signup.name });
       });
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape") close();
-      });
+      document.getElementById("success-done").addEventListener("click", function () { successModal.classList.add("hidden"); });
 
-      launchDemo.addEventListener("click", function () { handoff("demo"); });
-      launchFresh.addEventListener("click", function () { handoff("fresh"); });
-      launchKyc.addEventListener("click", function () { handoff("kyc"); });
+      // ---- Demo shortcuts ----
+      document.getElementById("launchDemo").addEventListener("click", function () { handoff(cfg.demoAccount || {}); });
+      document.getElementById("launchKyc").addEventListener("click", function () { handoff(cfg.kycAccount || {}); });
 
-      // ---- Dev tool: approve an existing account by email ----
-      // Calls the dev-only BFF endpoint /api/admin/approve-account, which flips
-      // the user's Airwallex account to ACTIVE (sandbox) and marks them VERIFIED.
+      // ---- Dev tool: approve an account by email ----
       var approveBtn = document.getElementById("approveBtn");
       var approveEmail = document.getElementById("approveEmail");
       var approveMsg = document.getElementById("approveMsg");
-      function apiBase() {
-        var cfg = window.WLTH_SSO || {};
-        return (cfg.ssoUrl || "").replace(/\/sso\/wlth\/?$/, "");
-      }
       async function approve() {
         var email = (approveEmail.value || "").trim();
-        approveMsg.className = "dev-tool-msg";
+        approveMsg.className = "dev-msg";
         if (!email) { approveMsg.textContent = "Enter an email."; return; }
-        approveBtn.disabled = true;
-        approveMsg.textContent = "Approving…";
+        approveBtn.disabled = true; approveMsg.textContent = "Approving…";
         try {
-          var res = await fetch(apiBase() + "/admin/approve-account", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email })
-          });
+          var res = await fetch(apiBase() + "/admin/approve-account", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: email }) });
           var data = await res.json().catch(function () { return {}; });
-          if (res.ok) {
-            approveMsg.textContent = "✓ Approved — " + (data.kycStatus || "VERIFIED") +
-              " · " + (data.airwallexAccountId || "");
-            approveMsg.className = "dev-tool-msg ok";
-          } else {
-            approveMsg.textContent = "✗ " + ((data.error && data.error.message) || ("HTTP " + res.status));
-            approveMsg.className = "dev-tool-msg err";
-          }
-        } catch (e) {
-          approveMsg.textContent = "✗ " + e.message;
-          approveMsg.className = "dev-tool-msg err";
-        } finally {
-          approveBtn.disabled = false;
-        }
+          if (res.ok) { approveMsg.textContent = "✓ Approved — " + (data.kycStatus || "VERIFIED") + " · " + (data.airwallexAccountId || ""); approveMsg.className = "dev-msg ok"; }
+          else { approveMsg.textContent = "✗ " + ((data.error && data.error.message) || ("HTTP " + res.status)); approveMsg.className = "dev-msg err"; }
+        } catch (e) { approveMsg.textContent = "✗ " + e.message; approveMsg.className = "dev-msg err"; }
+        finally { approveBtn.disabled = false; }
       }
       approveBtn.addEventListener("click", approve);
       approveEmail.addEventListener("keydown", function (e) { if (e.key === "Enter") approve(); });
-
-      items.forEach(function (el) {
-        el.addEventListener("click", function (e) {
-          e.stopPropagation();
-          if (el.getAttribute("data-service") === "pay") {
-            handoff("demo");      // Pay hands off to the dev Pay UI (demo account)
-            return;
-          }
-          selectService(el);      // other services just switch the shown value
-          close();
-        });
-      });
     })();
   </script>
 </body>
