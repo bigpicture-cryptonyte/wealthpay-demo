@@ -417,17 +417,6 @@
             </span>
           </button>
 
-          <button class="option" id="opt-juno">
-            <span class="opt-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>
-            </span>
-            <div class="opt-title">WLTH / Juno Money account</div>
-            <div class="opt-sub">Onboard through Juno Money — your details are shared with WLTH to create your account.</div>
-            <span class="opt-cta">
-              Continue with Juno Money
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </span>
-          </button>
         </div>
       </section>
 
@@ -824,11 +813,6 @@
 
       // WLTH direct -> registration form
       document.getElementById("opt-wlth").addEventListener("click", function () { show(stepSignup); });
-
-      // WLTH / Juno Money -> hand off to Juno (1b journey)
-      document.getElementById("opt-juno").addEventListener("click", function () {
-        window.location.href = window.JUNO_REDIRECT_URL;
-      });
 
       document.getElementById("back-to-choose").addEventListener("click", function () { show(stepChoose); });
 

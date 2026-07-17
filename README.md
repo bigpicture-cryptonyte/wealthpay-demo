@@ -9,13 +9,11 @@ access to that). It exists so we can demonstrate the full sign-up → onboarding
 
 ## Pages
 
-- **`/` ([`index.html`](./index.html)) — the sign-up landing.** Choose **WLTH** or
-  **WLTH / Juno Money**:
+- **`/` ([`index.html`](./index.html)) — the sign-up landing.**
   - **WLTH account** — a prefilled WLTH registration form. **Create account** POSTs to the dev
     BFF's temp `/signup-draft` endpoint (which saves the signup in its **own collection** and
     mints a `wlthId`), then shows a success modal. **Continue to WealthPay** saves the account and
     redirects to `/home` (mimicking login).
-  - **WLTH / Juno Money account** — hands the customer off to Juno Money.
 - **`/home` ([`home.html`](./home.html)) — the signed-in WealthPay shell.** Header matches the Pay
   UI (WLTH logo + product switcher + org chip / bell / avatar). Choosing **Pay** in the product
   switcher (or the **Open WLTH Pay** button) mints a WLTH SSO token for the created `wlthId` and
