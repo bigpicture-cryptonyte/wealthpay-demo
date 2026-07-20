@@ -181,11 +181,10 @@
     <div class="modal">
       <span class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
       <h2>WLTH account created</h2>
-      <p class="m-sub">You’re all set — your WLTH account is ready. Log in with your new credentials to continue.</p>
+      <p class="m-sub">You’re all set — your WLTH account is ready.</p>
       <p class="m-id" id="success-id"></p>
       <div class="m-actions">
-        <button class="btn-primary" id="apply-btn">Continue to log in <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
-        <button class="btn-ghost" id="success-done">Not now</button>
+        <button class="btn-primary" id="apply-btn">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
       </div>
     </div>
   </div>
@@ -262,15 +261,11 @@
         successModal.classList.remove("hidden");
       });
 
-      // Account created -> DON'T auto-login. Stash the credentials so the login
-      // page can prefill them, and send the user to log in manually.
+      // Account created -> log in directly (save the session) and go to /home.
       document.getElementById("apply-btn").addEventListener("click", function () {
-        if (signup) {
-          try { localStorage.setItem("wlthDemoPending", JSON.stringify({ email: signup.email, password: signup.password })); } catch (e) { /* ignore */ }
-        }
-        window.location.href = "/login";
+        if (signup) window.WlthSso.saveAccount(signup);
+        window.location.href = "/home";
       });
-      document.getElementById("success-done").addEventListener("click", function () { successModal.classList.add("hidden"); });
     })();
   </script>
 </body>
