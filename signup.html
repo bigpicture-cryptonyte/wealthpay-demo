@@ -181,10 +181,10 @@
     <div class="modal">
       <span class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
       <h2>WLTH account created</h2>
-      <p class="m-sub">You’re all set — your WLTH account is ready. Continue to your home.</p>
+      <p class="m-sub">You’re all set — your WLTH account is ready. Log in with your new credentials to continue.</p>
       <p class="m-id" id="success-id"></p>
       <div class="m-actions">
-        <button class="btn-primary" id="apply-btn">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        <button class="btn-primary" id="apply-btn">Continue to log in <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
         <button class="btn-ghost" id="success-done">Not now</button>
       </div>
     </div>
@@ -197,7 +197,11 @@
       var createBtn = document.getElementById("create-btn");
       var formError = document.getElementById("form-error");
 
-      // Captured after a successful signup — saved and reused on the home page.
+      // Fresh random email on each load, so every demo signup is a new account.
+      var rand = Math.random().toString(36).slice(2, 8);
+      signupForm.email.value = "jane.doe+" + rand + "@acmepay.com.au";
+
+      // Captured after a successful signup — used to prefill the login page.
       var signup = null;
 
       function markField(input, invalid) { var f = input.closest(".field"); if (f) f.classList.toggle("invalid", invalid); }
@@ -251,17 +255,20 @@
         if (!wlthId) wlthId = "wlth-" + crypto.randomUUID();
         if (!name) name = [body.firstName, body.lastName].filter(Boolean).join(" ") || "New User";
 
-        signup = { wlthId: wlthId, email: email, name: name };
-        document.getElementById("success-id").textContent = "WLTH ID · " + wlthId;
+        signup = { wlthId: wlthId, email: email, name: name, password: body.password };
+        document.getElementById("success-id").textContent = email + "  ·  WLTH ID · " + wlthId;
         createBtn.disabled = false;
         createBtn.innerHTML = 'Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
         successModal.classList.remove("hidden");
       });
 
-      // Account created -> save the session and go to /home (mimics login).
+      // Account created -> DON'T auto-login. Stash the credentials so the login
+      // page can prefill them, and send the user to log in manually.
       document.getElementById("apply-btn").addEventListener("click", function () {
-        if (signup) window.WlthSso.saveAccount(signup);
-        window.location.href = "/home";
+        if (signup) {
+          try { localStorage.setItem("wlthDemoPending", JSON.stringify({ email: signup.email, password: signup.password })); } catch (e) { /* ignore */ }
+        }
+        window.location.href = "/login";
       });
       document.getElementById("success-done").addEventListener("click", function () { successModal.classList.add("hidden"); });
     })();

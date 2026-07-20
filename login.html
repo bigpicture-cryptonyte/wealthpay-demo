@@ -102,6 +102,17 @@
       var btn = document.getElementById("login-btn");
       var formError = document.getElementById("form-error");
 
+      // Prefill the credentials just created on the signup page (one-time; the
+      // user still clicks Log in — no auto-login).
+      try {
+        var pending = JSON.parse(localStorage.getItem("wlthDemoPending") || "null");
+        if (pending) {
+          form.email.value = pending.email || "";
+          form.password.value = pending.password || "";
+          localStorage.removeItem("wlthDemoPending");
+        }
+      } catch (e) { /* ignore */ }
+
       function markField(input, invalid) { var f = input.closest(".field"); if (f) f.classList.toggle("invalid", invalid); }
 
       form.addEventListener("submit", async function (e) {
