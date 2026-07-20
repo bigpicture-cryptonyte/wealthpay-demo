@@ -8,6 +8,16 @@
   <link rel="icon" href="data:," />
 
   <script src="wlth-sso.js?v=2"></script>
+  <script>
+    // Already signed in? Skip the landing and go straight to the WLTH home.
+    // Runs before render (in <head>) so there's no flash of the landing page.
+    (function () {
+      try {
+        var a = window.WlthSso && WlthSso.getAccount && WlthSso.getAccount();
+        if (a && a.wlthId) window.location.replace('/home');
+      } catch (e) {}
+    })();
+  </script>
 
   <style>
     :root {
@@ -81,12 +91,9 @@
       <svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg>
       <span class="demo-tag">Demo</span>
       <div class="spacer"></div>
-      <div class="nav-actions" id="navActions">
+      <div class="nav-actions">
         <a class="btn btn-text" href="/login">Log in</a>
         <a class="btn btn-solid" href="/signup">Sign up</a>
-      </div>
-      <div class="nav-actions hidden" id="navSignedIn">
-        <button class="btn btn-text" id="navLogout">Log out</button>
       </div>
     </div>
   </header>
@@ -96,12 +103,7 @@
       <h1>One account for your wealth.</h1>
       <p>Broking, payments, shareholder tools and more — all under a single WLTH account. Sign up once, then move seamlessly between products.</p>
 
-      <div class="signed-in hidden" id="signedIn">
-        <div class="who">Signed in as <b id="whoName">—</b></div>
-        <a class="btn btn-solid" href="/home">Continue to WLTH <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
-      </div>
-
-      <div class="hero-actions" id="heroActions">
+      <div class="hero-actions">
         <a class="btn btn-solid btn-lg" href="/signup">Create your account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
         <a class="btn btn-outline btn-lg" href="/login">Log in</a>
       </div>
@@ -139,22 +141,5 @@
     </div>
   </footer>
 
-  <script>
-    (function () {
-      var acct = window.WlthSso.getAccount && window.WlthSso.getAccount();
-      if (acct && acct.wlthId) {
-        document.getElementById("whoName").textContent = acct.name || acct.email || "your account";
-        document.getElementById("signedIn").classList.remove("hidden");
-        document.getElementById("heroActions").classList.add("hidden");
-        // Signed in: swap header Log in / Sign up for a Log out.
-        document.getElementById("navActions").classList.add("hidden");
-        document.getElementById("navSignedIn").classList.remove("hidden");
-        document.getElementById("navLogout").addEventListener("click", function () {
-          window.WlthSso.clearAccount();
-          window.location.reload();
-        });
-      }
-    })();
-  </script>
 </body>
 </html>
