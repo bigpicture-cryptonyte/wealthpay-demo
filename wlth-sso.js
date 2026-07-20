@@ -63,15 +63,30 @@ window.WlthSso = (function () {
     return data + "." + b64url(sig);
   }
   // Mint a WLTH SSO token for `claims` and open the dev BFF hand-off (new tab).
+  // Mint a WLTH SSO token for `claims` and hand off to the dev BFF in the SAME
+  // tab (seamless redirect into WLTH Pay — no new tab).
   async function handoff(claims) {
     if (!cfg.privateKeyPkcs8Pem) { alert("Dev SSO key not configured."); return; }
     try {
       var token = await mintToken(claims);
-      window.open(cfg.ssoUrl + "?token=" + encodeURIComponent(token), "_blank", "noopener");
+      window.location.assign(cfg.ssoUrl + "?token=" + encodeURIComponent(token));
     } catch (e) { alert("Could not mint SSO token: " + e.message); }
   }
-  // Persist the just-created demo account across pages (landing -> /home).
+  // Demo login: validate email + password against the BFF's signup drafts.
+  // Resolves to { wlthId, email, name } or throws with a user-facing message.
+  async function login(email, password) {
+    var res = await fetch(apiBase() + "/signup-draft/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: password }),
+    });
+    if (res.status === 401) throw new Error("Invalid email or password.");
+    if (!res.ok) throw new Error("Could not sign in. Please try again.");
+    return res.json();
+  }
+  // Persist / read / clear the signed-in demo account across pages.
   function saveAccount(a) { try { localStorage.setItem('wlthDemoAccount', JSON.stringify(a)); } catch (e) { /* ignore */ } }
   function getAccount() { try { return JSON.parse(localStorage.getItem('wlthDemoAccount') || 'null'); } catch (e) { return null; } }
-  return { apiBase: apiBase, handoff: handoff, saveAccount: saveAccount, getAccount: getAccount };
+  function clearAccount() { try { localStorage.removeItem('wlthDemoAccount'); } catch (e) { /* ignore */ } }
+  return { apiBase: apiBase, handoff: handoff, login: login, saveAccount: saveAccount, getAccount: getAccount, clearAccount: clearAccount };
 })();

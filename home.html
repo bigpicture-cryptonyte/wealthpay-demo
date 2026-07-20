@@ -108,6 +108,7 @@
           <button class="bell" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button>
           <div class="avatar" id="avatar">JD</div>
         </div>
+        <button id="logout" style="margin-left:12px;font-size:13px;font-weight:600;color:#6f7682;background:#fff;border:1px solid #eceff0;padding:9px 14px;border-radius:10px;cursor:pointer;">Log out</button>
       </div>
     </div>
   </header>
@@ -127,9 +128,15 @@
 
   <script>
     (function () {
-      var cfg = window.WLTH_SSO || {};
-      // The account created on the sign-up landing (falls back to the demo account).
-      var acct = (window.WlthSso.getAccount && window.WlthSso.getAccount()) || cfg.demoAccount || {};
+      // Auth gate: this landing requires a signed-in session (sign up or log in first).
+      var acct = window.WlthSso.getAccount && window.WlthSso.getAccount();
+      if (!acct || !acct.wlthId) { window.location.replace('/login'); return; }
+
+      // Log out -> clear the session and return to the login page.
+      document.getElementById('logout').addEventListener('click', function () {
+        window.WlthSso.clearAccount();
+        window.location.replace('/login');
+      });
 
       // Avatar initials + signed-in line from the created account.
       function initials(name) { return (name || 'WP').split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
