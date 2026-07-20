@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WealthPay — Home</title>
-  <meta name="description" content="WealthPay platform home (demo). Select Pay from the product switcher to open WLTH Pay." />
+  <title>WLTH — Your money</title>
+  <meta name="description" content="WLTH money dashboard (demo). The natural evolution of money." />
   <link rel="icon" href="data:," />
 
   <script src="wlth-sso.js?v=2"></script>
@@ -12,48 +12,37 @@
   <style>
     :root {
       --bg: #f4f4f4; --surface: #ffffff; --text: #292e3a; --text-dimmed: #6f7682; --text-muted: #8a909c;
-      --blue-500: #1445c7; --blue-400: #3d6ae0; --blue-soft: #eef1ff; --brand-50: #eef2fc;
+      --blue-500: #1445c7; --blue-400: #3d6ae0; --blue-600: #1039a8; --blue-soft: #eef1ff; --brand-50: #eef2fc;
       --border: #eceff0; --pill-border: #b8c5ca; --lightgrey-300: #eceff0; --lightgrey-400: #dde2e3;
-      --ink-soft: #4c5a68;
+      --ink-soft: #4c5a68; --teal: #0e7c86; --teal-soft: #e5f4f5; --success: #0a8a52; --danger: #c0392b;
+      --shadow-card: 0 1px 2px rgba(16,24,40,.04), 0 8px 24px -12px rgba(16,24,40,.12);
       --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
       --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; -webkit-font-smoothing: antialiased; }
     button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    a { color: var(--blue-500); text-decoration: none; }
 
     /* ---------------- Header (matches the Pay UI) ---------------- */
-    header { width: 100%; }
-    .header-inner { max-width: 1320px; margin: 0 auto; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    header { width: 100%; border-bottom: 1px solid var(--border); background: var(--bg); }
+    .header-inner { max-width: 1320px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .left, .right { display: flex; align-items: center; gap: 16px; }
     .logo { height: 19px; width: auto; color: var(--text); }
-
-    /* Product switcher + right cluster live in white pills */
     .pill { display: flex; align-items: center; gap: 12px; background: var(--surface); border-radius: 9999px; padding: 8px 12px; }
-
     .switcher { position: relative; }
-    .switch-trigger {
-      display: flex; align-items: center; gap: 8px;
-      border: 1px solid var(--pill-border); border-radius: 14px; background: transparent;
-      color: var(--text); padding: 8px 14px; font-size: 14px; font-weight: 500; transition: background .12s ease;
-    }
+    .switch-trigger { display: flex; align-items: center; gap: 8px; border: 1px solid var(--pill-border); border-radius: 14px; background: transparent; color: var(--text); padding: 8px 14px; font-size: 14px; font-weight: 500; transition: background .12s ease; }
     .switch-trigger:hover { background: var(--lightgrey-300); }
     .switch-trigger .pi { width: 18px; height: 18px; color: var(--ink-soft); }
     .switch-trigger .chev { width: 16px; height: 16px; color: var(--ink-soft); transition: transform .2s ease; }
     .switcher.open .switch-trigger .chev { transform: rotate(180deg); }
-
-    .menu {
-      position: absolute; top: calc(100% + 8px); left: 0; min-width: 220px;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      box-shadow: var(--shadow-menu); padding: 8px; display: none; flex-direction: column; gap: 2px; z-index: 50;
-    }
+    .menu { position: absolute; top: calc(100% + 8px); left: 0; min-width: 220px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-menu); padding: 8px; display: none; flex-direction: column; gap: 2px; z-index: 50; }
     .switcher.open .menu { display: flex; }
     .menu-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 12px; border-radius: 12px; font-size: 14px; font-weight: 500; color: var(--text); text-align: left; }
     .menu-item:hover { background: #f5f6f7; }
     .menu-item svg { width: 18px; height: 18px; color: var(--ink-soft); flex-shrink: 0; }
     .menu-item.current { background: var(--blue-soft); color: var(--blue-500); }
     .menu-item.current svg { color: var(--blue-500); }
-
     .org { display: flex; align-items: center; gap: 8px; border: 1px solid var(--pill-border); border-radius: 14px; background: transparent; padding: 7px 12px; font-size: 14px; font-weight: 500; color: var(--text); }
     .org:hover { background: var(--lightgrey-300); }
     .mono { width: 24px; height: 24px; border-radius: 9999px; background: var(--brand-50); color: var(--blue-500); font-size: 10px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
@@ -62,21 +51,98 @@
     .bell svg { width: 16px; height: 16px; }
     .bell::after { content: ""; position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 9999px; background: #42d996; border: 2px solid var(--ink-soft); }
     .avatar { width: 36px; height: 36px; border-radius: 9999px; background: var(--text); color: #fff; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; }
+    .logout { font-size: 13px; font-weight: 600; color: var(--text-dimmed); background: var(--surface); border: 1px solid var(--border); padding: 9px 14px; border-radius: 10px; }
+    .logout:hover { color: var(--text); }
 
-    /* ---------------- Hero ---------------- */
-    main { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 90px 24px; }
-    .badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(66,217,150,.14); color: #0a8a52; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 9999px; }
-    .badge svg { width: 15px; height: 15px; }
-    h1 { margin-top: 18px; font-size: 40px; font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
-    .sub { max-width: 540px; margin: 16px auto 0; color: var(--text-dimmed); font-size: 16px; line-height: 1.6; }
-    .signed { margin-top: 6px; font-size: 14px; color: var(--text-muted); }
-    .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--blue-500); color: #fff; font-size: 16px; font-weight: 500; padding: 14px 24px; border-radius: 12px; margin-top: 28px; transition: background .15s ease, transform .1s ease; }
-    .cta:hover { background: #1039a8; } .cta:active { transform: translateY(1px); }
-    .cta svg { width: 18px; height: 18px; }
-    .hint { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s ease; pointer-events: none; }
+    /* ---------------- Dashboard ---------------- */
+    .dash { max-width: 1320px; margin: 0 auto; padding: 28px 24px 72px; }
+    .greet { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    .greet h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+    .greet .muted { margin-top: 4px; color: var(--text-dimmed); font-size: 14px; }
+    .impact-chip { display: inline-flex; align-items: center; gap: 7px; background: var(--teal-soft); color: var(--teal); font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 9999px; white-space: nowrap; }
+    .impact-chip svg { width: 16px; height: 16px; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow-card); padding: 22px; }
+    .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .card-head h2 { font-size: 15px; font-weight: 600; }
+    .card-head a { font-size: 13px; font-weight: 600; }
+    .muted { color: var(--text-dimmed); }
+
+    .grid-top { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; }
+    .grid-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+    .products-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-top: 18px; }
+    @media (max-width: 900px) { .grid-top, .grid-two { grid-template-columns: 1fr; } .products-row { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .products-row { grid-template-columns: 1fr; } }
+
+    /* balance hero */
+    .balance-hero { display: flex; flex-direction: column; }
+    .balance-hero .label { font-size: 13px; color: var(--text-dimmed); font-weight: 500; }
+    .balance-hero .amount { font-size: 40px; font-weight: 600; letter-spacing: -.03em; margin-top: 4px; }
+    .balance-hero .delta { margin-top: 6px; font-size: 13px; font-weight: 600; color: var(--success); }
+    .sub-accounts { display: flex; gap: 12px; margin-top: 20px; }
+    .sub-accounts > div { flex: 1; background: #fafbfc; border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; }
+    .sub-accounts span { display: block; font-size: 12px; color: var(--text-dimmed); }
+    .sub-accounts b { font-size: 16px; font-weight: 600; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .act { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--blue-500); background: var(--blue-soft); border-radius: 12px; padding: 10px 14px; transition: background .12s ease; }
+    .act:hover { background: #e2e8ff; }
+    .act svg { width: 16px; height: 16px; }
+
+    /* debit card visual */
+    .card-visual { display: flex; flex-direction: column; }
+    .debit-card { position: relative; aspect-ratio: 1.6 / 1; border-radius: 18px; padding: 20px; color: #eafcff; overflow: hidden;
+      background: radial-gradient(120% 140% at 0% 0%, #1a6f7a 0%, #0e4f66 45%, #0a2a4d 100%); box-shadow: 0 12px 30px -12px rgba(10,42,77,.6); }
+    .debit-card::after { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 80% at 100% 0%, rgba(66,217,150,.25), transparent 60%); }
+    .dc-top { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 1; }
+    .dc-logo { font-size: 18px; font-weight: 700; letter-spacing: .04em; }
+    .dc-eco { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; background: rgba(255,255,255,.16); padding: 4px 8px; border-radius: 9999px; }
+    .dc-eco svg { width: 12px; height: 12px; }
+    .dc-num { position: absolute; left: 20px; bottom: 52px; font-size: 17px; letter-spacing: .18em; z-index: 1; font-variant-numeric: tabular-nums; }
+    .dc-bottom { position: absolute; left: 20px; right: 20px; bottom: 18px; display: flex; align-items: center; justify-content: space-between; z-index: 1; }
+    .dc-bottom .nm { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; opacity: .9; }
+    .dc-bottom .visa { font-size: 15px; font-weight: 700; font-style: italic; }
+    .card-note { margin-top: 14px; font-size: 12.5px; color: var(--text-dimmed); line-height: 1.5; }
+
+    /* home loan */
+    .pill-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); background: var(--lightgrey-300); padding: 4px 10px; border-radius: 9999px; }
+    .loan-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
+    .loan-row:last-of-type { border-bottom: none; }
+    .loan-row span { color: var(--text-dimmed); }
+    .loan-row b { font-weight: 600; }
+    .bar { height: 8px; border-radius: 9999px; background: var(--lightgrey-300); overflow: hidden; margin-top: 14px; }
+    .bar > i { display: block; height: 100%; width: 22%; border-radius: 9999px; background: linear-gradient(90deg, var(--teal), #42d996); }
+    .eco-note { margin-top: 12px; display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--teal); }
+    .eco-note svg { width: 15px; height: 15px; }
+
+    /* wlth+ */
+    .wlth-plus { display: flex; flex-direction: column; }
+    .wlth-plus .points { font-size: 34px; font-weight: 600; letter-spacing: -.02em; margin: 4px 0; }
+    .wlth-plus .points span { font-size: 15px; font-weight: 500; color: var(--text-dimmed); }
+    .ghost-btn { align-self: flex-start; margin-top: auto; padding-top: 16px; font-size: 14px; font-weight: 600; color: var(--blue-500); display: inline-flex; align-items: center; gap: 6px; }
+    .ghost-btn svg { width: 16px; height: 16px; }
+
+    /* activity */
+    .activity { margin-top: 18px; }
+    .tx { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .tx:last-child { border-bottom: none; }
+    .tx .ic { width: 38px; height: 38px; border-radius: 12px; background: var(--blue-soft); color: var(--blue-500); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tx .ic svg { width: 18px; height: 18px; }
+    .tx .who { flex: 1; }
+    .tx .who b { font-size: 14px; font-weight: 600; display: block; }
+    .tx .who span { font-size: 12.5px; color: var(--text-dimmed); }
+    .tx .amt { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .tx .amt.in { color: var(--success); }
+
+    /* products */
+    .mini-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-card); transition: border-color .12s ease, transform .1s ease; }
+    .mini-card:hover { border-color: #dbe2fb; transform: translateY(-1px); }
+    .mini-card .ic { width: 40px; height: 40px; border-radius: 12px; background: var(--teal-soft); color: var(--teal); display: inline-flex; align-items: center; justify-content: center; }
+    .mini-card .ic svg { width: 19px; height: 19px; }
+    .mini-card h3 { margin-top: 12px; font-size: 15px; font-weight: 600; }
+    .mini-card p { margin-top: 4px; font-size: 13px; color: var(--text-dimmed); line-height: 1.5; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 13px; padding: 10px 16px; border-radius: 10px; opacity: 0; transition: opacity .2s ease; pointer-events: none; z-index: 90; }
     .toast.show { opacity: 1; }
-    @media (max-width: 780px) { .org, .right .pill { } h1 { font-size: 30px; } }
   </style>
 </head>
 <body>
@@ -87,16 +153,16 @@
         <div class="pill">
           <div class="switcher" id="switcher">
             <button class="switch-trigger" id="switchTrigger" aria-haspopup="menu" aria-expanded="false">
-              <svg class="pi" id="pillIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
-              <span id="pillLabel">Broker</span>
+              <svg class="pi" id="pillIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h.01"/></svg>
+              <span id="pillLabel">Money</span>
               <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="menu" role="menu" aria-label="Products">
-              <button class="menu-item current" role="menuitem" data-product="broker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg> Broker</button>
+              <button class="menu-item current" role="menuitem" data-product="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/></svg> Money</button>
               <button class="menu-item" role="menuitem" data-product="pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg> Pay</button>
-              <button class="menu-item" role="menuitem" data-product="shareholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg> Shareholder</button>
+              <button class="menu-item" role="menuitem" data-product="loans"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg> Loans</button>
+              <button class="menu-item" role="menuitem" data-product="rewards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><rect width="20" height="5" x="2" y="7"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg> Rewards</button>
               <button class="menu-item" role="menuitem" data-product="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Dashboard</button>
-              <button class="menu-item" role="menuitem" data-product="customer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Customer</button>
             </div>
           </div>
         </div>
@@ -108,20 +174,82 @@
           <button class="bell" aria-label="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg></button>
           <div class="avatar" id="avatar">JD</div>
         </div>
-        <button id="logout" style="margin-left:12px;font-size:13px;font-weight:600;color:#6f7682;background:#fff;border:1px solid #eceff0;padding:9px 14px;border-radius:10px;cursor:pointer;">Log out</button>
+        <button id="logout" class="logout">Log out</button>
       </div>
     </div>
   </header>
 
-  <main>
-    <div>
-      <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Signed in</span>
-      <h1>Welcome to WealthPay</h1>
-      <p class="sub">Your WLTH account is ready. Open the product switcher and choose <b>Pay</b> to launch WLTH Pay and complete onboarding.</p>
-      <p class="signed" id="signed"></p>
-      <button class="cta" id="launchPay">Open WLTH Pay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
-      <p class="hint">Broker, Shareholder, Dashboard and Customer are placeholders in this demo.</p>
+  <main class="dash">
+    <div class="greet">
+      <div>
+        <h1>Good afternoon, <span id="firstName">there</span></h1>
+        <p class="muted">The natural evolution of money — here's your account at a glance.</p>
+      </div>
+      <span class="impact-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg> 250m² coastline cleaned</span>
     </div>
+
+    <section class="grid-top">
+      <div class="card balance-hero">
+        <p class="label">Total balance</p>
+        <p class="amount">A$60,680.65</p>
+        <p class="delta">▲ A$2,300.00 this month</p>
+        <div class="sub-accounts">
+          <div><span>Everyday</span><b>A$12,480.65</b></div>
+          <div><span>Savings</span><b>A$48,200.00</b></div>
+        </div>
+        <div class="actions">
+          <button class="act" data-demo="Pay someone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg> Pay someone</button>
+          <button class="act" data-demo="Transfer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg> Transfer</button>
+          <button class="act" data-demo="Add payee"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg> Add payee</button>
+          <button class="act" data-demo="Statements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/></svg> Statements</button>
+        </div>
+      </div>
+
+      <div class="card card-visual">
+        <div class="debit-card">
+          <div class="dc-top">
+            <span class="dc-logo">WLTH</span>
+            <span class="dc-eco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2"/></svg> Ocean Plastic</span>
+          </div>
+          <div class="dc-num">•••• •••• •••• 7854</div>
+          <div class="dc-bottom"><span class="nm" id="cardName">Your Name</span><span class="visa">VISA</span></div>
+        </div>
+        <p class="card-note">Your offset-linked debit card is made from upcycled, ocean-bound plastic. Every card helps clean Australian coastlines.</p>
+      </div>
+    </section>
+
+    <section class="grid-two">
+      <div class="card">
+        <div class="card-head"><h2>Your home loan</h2><span class="pill-tag">Variable</span></div>
+        <div class="loan-row"><span>Balance owing</span><b>A$540,000.00</b></div>
+        <div class="loan-row"><span>Interest rate</span><b>5.89% p.a.</b></div>
+        <div class="loan-row"><span>Offset (linked)</span><b>A$60,680.65</b></div>
+        <div class="bar"><i></i></div>
+        <p class="eco-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg> 50m² of coastline cleaned when your loan settled.</p>
+      </div>
+
+      <div class="card wlth-plus">
+        <div class="card-head"><h2>WLTH+</h2><span class="pill-tag">Rewards</span></div>
+        <p class="points">1,240 <span>points</span></p>
+        <p class="muted">You've helped clean 250m² of coastline and offset 1.2t of CO₂ this year.</p>
+        <button class="ghost-btn" data-demo="WLTH+ rewards">Explore rewards <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </section>
+
+    <section class="card activity">
+      <div class="card-head"><h2>Recent activity</h2><a href="#" data-demo="Activity" onclick="return false">View all</a></div>
+      <div class="tx"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div class="who"><b>Salary — Acme Corp</b><span>Today · Everyday account</span></div><span class="amt in">+ A$4,320.00</span></div>
+      <div class="tx"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><div class="who"><b>Woolworths</b><span>Yesterday · Card •••• 7854</span></div><span class="amt">- A$86.40</span></div>
+      <div class="tx"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></span><div class="who"><b>Home loan repayment</b><span>2 Jul · Direct debit</span></div><span class="amt">- A$2,180.00</span></div>
+      <div class="tx"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div class="who"><b>Transfer to Savings</b><span>1 Jul · Everyday account</span></div><span class="amt">- A$1,000.00</span></div>
+    </section>
+
+    <section class="products-row">
+      <div class="mini-card" data-demo="Home loans"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span><h3>Home Loans</h3><p>Low-rate loans with an offset-linked card.</p></div>
+      <div class="mini-card" data-demo="Business lending"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span><h3>Business</h3><p>Commercial &amp; SMSF lending for SMEs.</p></div>
+      <div class="mini-card" data-demo="Cards"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><h3>Cards</h3><p>Ocean-plastic debit &amp; corporate cards.</p></div>
+      <div class="mini-card" data-demo="Rewards"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v10H4V12"/><rect width="20" height="5" x="2" y="7"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span><h3>WLTH+</h3><p>Rewards that give back to the ocean.</p></div>
+    </section>
   </main>
 
   <div class="toast" id="toast"></div>
@@ -138,13 +266,23 @@
         window.location.replace('/login');
       });
 
-      // Avatar initials + signed-in line from the created account.
+      // Personalise from the signed-in account.
       function initials(name) { return (name || 'WP').split(/\s+/).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase(); }
+      var name = acct.name || acct.email || 'there';
       document.getElementById('avatar').textContent = initials(acct.name);
-      document.getElementById('signed').textContent = acct.wlthId ? ('Signed in as ' + (acct.name || acct.email || acct.wlthId) + ' · ' + acct.wlthId) : '';
+      document.getElementById('firstName').textContent = (acct.name || '').split(/\s+/)[0] || 'there';
+      document.getElementById('cardName').textContent = (acct.name || 'Your Name');
 
+      // Toast for demo-only controls.
+      var toastEl = document.getElementById('toast'); var toastT;
+      function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 1800); }
+      document.querySelectorAll('[data-demo]').forEach(function (el) {
+        el.addEventListener('click', function (e) { e.preventDefault(); toast(el.getAttribute('data-demo') + ' is a demo placeholder'); });
+      });
+
+      // Product hand-off: choosing "Pay" from the switcher mints an SSO token and
+      // redirects (same tab) into WLTH Pay.
       function toPay() { window.WlthSso.handoff({ wlthId: acct.wlthId, email: acct.email, name: acct.name }); }
-      document.getElementById('launchPay').addEventListener('click', toPay);
 
       // Product switcher
       var switcher = document.getElementById('switcher');
@@ -152,8 +290,6 @@
       var pillIcon = document.getElementById('pillIcon');
       var pillLabel = document.getElementById('pillLabel');
       var items = document.querySelectorAll('.menu-item');
-      var toastEl = document.getElementById('toast'); var toastT;
-      function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 1800); }
       function open() { switcher.classList.add('open'); trigger.setAttribute('aria-expanded', 'true'); }
       function close() { switcher.classList.remove('open'); trigger.setAttribute('aria-expanded', 'false'); }
       trigger.addEventListener('click', function (e) { e.stopPropagation(); switcher.classList.contains('open') ? close() : open(); });
@@ -163,7 +299,6 @@
         el.addEventListener('click', function (e) {
           e.stopPropagation();
           if (el.getAttribute('data-product') === 'pay') { toPay(); return; }
-          // other products are placeholders — just switch the shown value
           var icon = el.querySelector('svg'); if (icon) pillIcon.innerHTML = icon.innerHTML;
           pillLabel.textContent = el.textContent.trim();
           items.forEach(function (i) { i.classList.remove('current'); });
