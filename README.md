@@ -1,34 +1,45 @@
 # WealthPay Demo App
 
-A **static demo** of the WealthPay (WLTH) platform shell. Its only job is to mimic the
-WLTH top bar with the **Pay** service dropdown and hand the user off to our separately-built
-**Pay frontend** when they click **Pay**.
+A **static demo** of the WLTH Pay customer sign-up. It captures an initial WLTH signup, hands
+the user off to our separately-built **Pay frontend** (dev) via a WLTH SSO token, and lets the
+Pay UI prefill KYC from the signup.
 
 This is throwaway/demo scaffolding — it is **not** the real WealthPay platform (we don't have
-access to that). It exists so we can demonstrate the full hand-off flow end-to-end.
+access to that). It exists so we can demonstrate the full sign-up → onboarding flow end-to-end.
 
-## What it does
+## Pages
 
-- A minimal WLTH platform shell: logo + **Demo** tag, the **Pay** service switcher
-  (Broker / Pay / Shareholder / Dashboard / Customer), account chip + avatar.
-- A simple welcome hero with a **Launch Pay** button.
-- Clicking **Pay** in the dropdown (or **Launch Pay**) redirects to the Pay frontend.
-- The other four services are demo-only (they show a small "demo only" toast).
+- **`/` ([`index.html`](./index.html)) — public home page** for WLTH.com: hero + product cards, with
+  **Log in** / **Sign up** CTAs. If a session already exists it shows "Continue to WLTH" (`/home`).
+- **`/signup` ([`signup.html`](./signup.html)) — sign-up.** A prefilled WLTH registration form
+  (incl. a password). **Create account** POSTs to the dev BFF's `/signup-draft` (saves the signup in
+  its **own collection**, stores a scrypt-hashed password, mints a `wlthId`), then shows a success
+  modal. **Continue** saves the session and redirects to `/home`.
+- **`/login` ([`login.html`](./login.html)) — log in.** Email + password → `POST /signup-draft/login`
+  (validated against the stored hash) → saves the session → `/home`. Same credentials as sign-up.
+- **`/home` ([`home.html`](./home.html)) — the signed-in WLTH landing.** Requires a session
+  (redirects to `/login` otherwise); has a **Log out**. Header matches the Pay UI (WLTH logo +
+  product switcher + org chip / bell / avatar). Choosing **Pay** (or **Open WLTH Pay**) mints a WLTH
+  SSO token for the `wlthId` and **redirects in the same tab** into the dev Pay UI, which prefills KYC
+  from the saved signup. Other products are demo placeholders.
+- **`/dev` ([`dev.html`](./dev.html)) — dev tools.** Jump straight into the demo/KYC account on
+  dev, or approve an account.
 
-> Note: there are no Pay pages here on purpose. Payments / payees / cards etc. live in the
-> separate **Pay frontend** repo — this shell only launches it.
+## Configure the endpoints
 
-## Configure the redirect target
+Shared config + SSO token minting live in one place — [`wlth-sso.js`](./wlth-sso.js):
 
-The hand-off URL lives in one place at the top of [`index.html`](./index.html):
-
-```html
-<script>
-  window.PAY_REDIRECT_URL = "https://wealth-pay-web-ui.vercel.app/"; // deployed Pay frontend
-</script>
+```js
+window.JUNO_REDIRECT_URL = "https://dev2.junomoney.org/invite-to-register/ru02k2fwck/business";
+window.WLTH_SSO = {
+  ssoUrl: "https://dev-wealthpay.junomoney.org/api/sso/wlth", // dev BFF SSO endpoint (API base = ssoUrl without /sso/wlth)
+  demoAccount: { ... }, kycAccount: { ... },
+  privateKeyPkcs8Pem: `-----BEGIN PRIVATE KEY-----…`,          // DEV-ONLY RS256 key (public half = dev BFF WLTH_SSO_PUBLIC_KEY)
+};
 ```
 
-Points to the deployed Pay frontend. Update it here if that URL ever changes.
+Every page loads `wlth-sso.js`, so the key/URLs — and the shared `login` / `handoff` / session
+helpers — are defined once.
 
 ## Run locally
 

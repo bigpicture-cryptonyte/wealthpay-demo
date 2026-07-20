@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WLTH — Sign up</title>
+  <meta name="description" content="Create a WLTH account. Demo sign-up for the WLTH platform." />
+  <link rel="icon" href="data:," />
+
+  <!-- Shared WLTH SSO config + token minting (dev). Dev tools live at /dev. -->
+  <script src="wlth-sso.js?v=2"></script>
+
+  <style>
+    :root {
+      --bg: #f4f4f4;
+      --surface: #ffffff;
+      --text: #292e3a;
+      --text-dimmed: #6f7682;
+      --text-muted: #8a909c;
+      --blue-500: #1445c7;
+      --blue-400: #3d6ae0;
+      --blue-600: #1039a8;
+      --blue-soft: #eef1ff;
+      --border: #eceff0;
+      --field-border: #d7dadf;
+      --danger: #d64545;
+      --success: #04ca72;
+      --shadow-panel: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+      --shadow-menu: 0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.1);
+      --font: "Inter", SuisseIntl, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--bg); color: var(--text); font-family: var(--font);
+      min-height: 100vh; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+    a { color: var(--blue-500); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+    .demo-bar {
+      background: var(--blue-soft); color: var(--blue-500);
+      font-size: 13px; font-weight: 500; text-align: center;
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
+    }
+    .demo-bar b { font-weight: 600; }
+
+    header { height: 84px; display: flex; align-items: center; }
+    .header-inner {
+      width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .logo { height: 19px; width: auto; color: var(--text); user-select: none; }
+    .demo-tag {
+      font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--blue-500); background: var(--blue-soft); border: 1px solid #dbe2fb;
+      padding: 3px 8px; border-radius: 9999px;
+    }
+    .spacer { flex: 1; }
+    .dev-link { font-size: 13px; font-weight: 500; color: var(--text-dimmed); }
+    .dev-link:hover { color: var(--text); text-decoration: none; }
+
+    main { display: flex; justify-content: center; padding: 32px 24px 72px; }
+    .panel {
+      width: 100%; max-width: 640px; background: var(--surface);
+      border-radius: 24px; box-shadow: var(--shadow-panel); padding: 40px;
+    }
+    @media (max-width: 560px) { .panel { padding: 24px; } }
+    .panel-head { margin-bottom: 24px; }
+    .panel-head h1 { font-size: 26px; font-weight: 600; letter-spacing: -.02em; }
+    .panel-head p { margin-top: 6px; color: var(--text-dimmed); font-size: 15px; line-height: 1.5; }
+
+    form { display: flex; flex-direction: column; gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 560px) { .grid-2 { grid-template-columns: 1fr; } }
+    .field > .label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 600; }
+    .field .label .opt { font-weight: 400; color: var(--text-dimmed); }
+    .field .label .req { color: var(--danger); }
+    .field input, .field select {
+      width: 100%; font-family: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+      border: 1px solid var(--field-border); border-radius: 12px; padding: 10px 14px; transition: border-color .12s ease;
+    }
+    .field input::placeholder { color: var(--text-muted); }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--blue-500); }
+    .field .err { margin-top: 5px; font-size: 12px; color: var(--danger); display: none; }
+    .field.invalid .err { display: block; }
+    .field.invalid input { border-color: var(--danger); }
+    .check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text-dimmed); }
+    .check input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--blue-500); flex-shrink: 0; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+      background: var(--blue-500); color: #fff; font-size: 16px; font-weight: 500;
+      padding: 13px 24px; border-radius: 12px; margin-top: 6px; transition: background .15s ease, transform .1s ease;
+    }
+    .btn-primary:hover { background: var(--blue-600); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { opacity: .6; cursor: default; }
+    .btn-primary svg { width: 18px; height: 18px; }
+
+    .alt { margin-top: 18px; text-align: center; font-size: 14px; color: var(--text-dimmed); }
+
+    /* Success modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 100; background: rgba(20,24,33,.55);
+      display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto;
+    }
+    .modal { width: 100%; max-width: 460px; background: var(--surface); border-radius: 24px; box-shadow: var(--shadow-menu); padding: 32px; text-align: center; animation: pop .16s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    .modal .m-icon {
+      width: 60px; height: 60px; margin: 0 auto; border-radius: 9999px;
+      background: rgba(4,202,114,.12); color: var(--success); display: inline-flex; align-items: center; justify-content: center;
+    }
+    .modal .m-icon svg { width: 30px; height: 30px; }
+    .modal h2 { margin-top: 18px; font-size: 22px; font-weight: 600; }
+    .modal .m-sub { margin: 8px auto 0; max-width: 380px; color: var(--text-dimmed); font-size: 14px; line-height: 1.5; }
+    .modal .m-id { margin-top: 14px; font-size: 12px; color: var(--text-muted); word-break: break-all; }
+    .modal .m-actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .btn-ghost { width: 100%; padding: 11px; border-radius: 12px; font-size: 15px; font-weight: 500; color: var(--text-dimmed); }
+    .btn-ghost:hover { background: #f5f6f7; color: var(--text); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="demo-bar">
+    <b>WLTH — Demo sign-up.</b> The account form is prefilled — just hit <b>Create account</b>.
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a href="/" aria-label="WLTH home"><svg class="logo" viewBox="0 0 80 19" fill="none" aria-label="WLTH"><path d="M6.7765 15.7156L11.4968 0.00566123H15.0306L19.6717 15.6895L23.8111 0.00566123H26.6327L21.3315 18.5507H18.0356L13.2632 2.39017L8.41146 18.5507H5.06227L0 0.00566123H2.82155L6.7765 15.7156ZM33.5439 0V16.1583H44.3592V18.5507H30.942V0H33.5439ZM59.5052 2.39244H52.646V18.5507H50.0453V2.39244H43.1103V0H59.5052V2.39244ZM65.856 8.07857H77.3992V0H80V18.5507H77.3992V10.4722H65.856V18.5507H63.254V0H65.856V8.07857Z" fill="currentColor"/></svg></a>
+      <span class="demo-tag">Demo</span>
+      <div class="spacer"></div>
+      <a class="dev-link" href="/login">Log in →</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="panel">
+      <div class="panel-head">
+        <h1>Create your WLTH account</h1>
+        <p>Every customer first creates a WLTH account. Details are prefilled for this demo — hit Create account to continue.</p>
+      </div>
+      <form id="signup-form" novalidate>
+        <div class="grid-2">
+          <label class="field"><span class="label">First name <span class="req">*</span></span><input name="firstName" required value="Jane" /><span class="err">Required</span></label>
+          <label class="field"><span class="label">Middle name <span class="opt">(optional)</span></span><input name="middleName" value="" placeholder="Alex" /></label>
+          <label class="field"><span class="label">Last name <span class="req">*</span></span><input name="lastName" required value="Doe" /><span class="err">Required</span></label>
+          <label class="field"><span class="label">Date of birth <span class="req">*</span></span><input name="dob" type="date" required value="1990-05-14" /><span class="err">Required</span></label>
+          <label class="field"><span class="label">Email address <span class="req">*</span></span><input name="email" type="email" required value="jane.doe@acmepay.com.au" /><span class="err">Enter a valid email</span></label>
+          <label class="field"><span class="label">Mobile number <span class="req">*</span></span><input name="mobile" type="tel" required value="+61 400 123 456" /><span class="err">Required</span></label>
+        </div>
+        <label class="field"><span class="label">Residential address <span class="req">*</span></span><input name="address" required value="123 George Street" /><span class="err">Required</span></label>
+        <div class="grid-2">
+          <label class="field"><span class="label">Suburb <span class="req">*</span></span><input name="suburb" required value="Sydney" /><span class="err">Required</span></label>
+          <label class="field"><span class="label">State <span class="req">*</span></span>
+            <select name="state" required><option value="">Select state</option><option>ACT</option><option selected>NSW</option><option>NT</option><option>QLD</option><option>SA</option><option>TAS</option><option>VIC</option><option>WA</option></select>
+            <span class="err">Required</span></label>
+          <label class="field"><span class="label">Postcode <span class="req">*</span></span><input name="postcode" required inputmode="numeric" pattern="\d{4}" value="2000" /><span class="err">4-digit postcode</span></label>
+          <label class="field"><span class="label">Country <span class="req">*</span></span>
+            <select name="country" required><option value="Australia" selected>Australia</option><option value="New Zealand">New Zealand</option></select>
+            <span class="err">Required</span></label>
+        </div>
+        <div class="grid-2">
+          <label class="field"><span class="label">Password <span class="req">*</span></span><input name="password" type="password" required minlength="8" value="Passw0rd!" /><span class="err">At least 8 characters</span></label>
+          <label class="field"><span class="label">Confirm password <span class="req">*</span></span><input name="confirmPassword" type="password" required minlength="8" value="Passw0rd!" /><span class="err">Passwords do not match</span></label>
+        </div>
+        <div class="field"><span class="err" id="form-error" style="display:none">Something went wrong</span></div>
+        <label class="check"><input type="checkbox" name="terms" required checked /> <span>I accept the <a href="#" onclick="return false">Terms &amp; Conditions</a></span></label>
+        <label class="check"><input type="checkbox" name="privacy" required checked /> <span>I accept the <a href="#" onclick="return false">Privacy Policy</a></span></label>
+        <button type="submit" class="btn-primary" id="create-btn">Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </form>
+      <p class="alt">Already have an account? <a href="/login">Log in</a></p>
+    </div>
+  </main>
+
+  <!-- Success modal -->
+  <div class="modal-overlay hidden" id="success">
+    <div class="modal">
+      <span class="m-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+      <h2>WLTH account created</h2>
+      <p class="m-sub">You’re all set — your WLTH account is ready.</p>
+      <p class="m-id" id="success-id"></p>
+      <div class="m-actions">
+        <button class="btn-primary" id="apply-btn">Continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var successModal = document.getElementById("success");
+      var signupForm = document.getElementById("signup-form");
+      var createBtn = document.getElementById("create-btn");
+      var formError = document.getElementById("form-error");
+
+      // Fresh random email on each load, so every demo signup is a new account.
+      var rand = Math.random().toString(36).slice(2, 8);
+      signupForm.email.value = "jane.doe+" + rand + "@acmepay.com.au";
+
+      // Captured after a successful signup — used to prefill the login page.
+      var signup = null;
+
+      function markField(input, invalid) { var f = input.closest(".field"); if (f) f.classList.toggle("invalid", invalid); }
+      function showError(msg) { formError.textContent = msg; formError.style.display = msg ? "block" : "none"; }
+
+      signupForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        showError("");
+        var valid = true;
+        signupForm.querySelectorAll("input, select").forEach(function (el) {
+          if (el.type === "checkbox") return;
+          var ok = el.checkValidity(); markField(el, !ok); if (!ok) valid = false;
+        });
+        if (signupForm.password.value && signupForm.confirmPassword.value && signupForm.password.value !== signupForm.confirmPassword.value) { markField(signupForm.confirmPassword, true); valid = false; }
+        if (!signupForm.terms.checked || !signupForm.privacy.checked) valid = false;
+        if (!valid) return;
+
+        var f = signupForm;
+        var body = {
+          firstName: f.firstName.value.trim(),
+          middleName: f.middleName.value.trim(),
+          lastName: f.lastName.value.trim(),
+          dateOfBirth: f.dob.value,
+          email: f.email.value.trim(),
+          password: f.password.value,
+          mobile: f.mobile.value.trim(),
+          residentialAddress: {
+            addressLine1: f.address.value.trim(),
+            suburb: f.suburb.value.trim(),
+            state: f.state.value,
+            postcode: f.postcode.value.trim(),
+            country: f.country.value,
+          },
+        };
+
+        createBtn.disabled = true;
+        createBtn.textContent = "Creating…";
+        var wlthId = null, name = null, email = body.email;
+        try {
+          var res = await fetch(window.WlthSso.apiBase() + "/signup-draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+          if (res.status === 409) {
+            createBtn.disabled = false;
+            createBtn.innerHTML = 'Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+            showError("An account already exists for this email. Log in instead.");
+            return;
+          }
+          if (res.ok) { var data = await res.json(); wlthId = data.wlthId; name = data.name; email = data.email || email; }
+        } catch (e) { /* best-effort — fall back below so the demo still flows */ }
+        // Fallback: if the temp API is unreachable, mint a local id so the hand-off
+        // still works (the app just won't find a draft to prefill, and login won't work).
+        if (!wlthId) wlthId = "wlth-" + crypto.randomUUID();
+        if (!name) name = [body.firstName, body.lastName].filter(Boolean).join(" ") || "New User";
+
+        signup = { wlthId: wlthId, email: email, name: name, password: body.password };
+        document.getElementById("success-id").textContent = email + "  ·  WLTH ID · " + wlthId;
+        createBtn.disabled = false;
+        createBtn.innerHTML = 'Create account <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+        successModal.classList.remove("hidden");
+      });
+
+      // Account created -> log in directly (save the session) and go to /home.
+      document.getElementById("apply-btn").addEventListener("click", function () {
+        if (signup) window.WlthSso.saveAccount(signup);
+        window.location.href = "/home";
+      });
+    })();
+  </script>
+</body>
+</html>
